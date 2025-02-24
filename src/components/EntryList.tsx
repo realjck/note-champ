@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Search, Trash2, Edit2 } from 'lucide-react';
+import { Search, Trash2, Edit2, X } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import DeleteModal from './DeleteModal';
 
@@ -18,6 +18,10 @@ export default function EntryList() {
     entry.content.toLowerCase().includes(search.toLowerCase())
   );
 
+  const sortedEntries = [...filteredEntries].sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
   const handleDeleteClick = (id: string, title: string) => {
     setSelectedEntry({ id, title });
     setDeleteModalOpen(true);
@@ -31,6 +35,10 @@ export default function EntryList() {
     }
   };
 
+  const clearSearch = () => {
+    setSearch('');
+  };
+
   return (
     <div className="p-4">
       <div className="sticky top-0 bg-gray-50 dark:bg-gray-900 py-2">
@@ -41,13 +49,21 @@ export default function EntryList() {
             placeholder="Search entries..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            className="w-full pl-10 pr-10 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           />
+          {search && (
+            <button
+              onClick={clearSearch}
+              className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
 
       <div className="mt-4 space-y-4">
-        {filteredEntries.map(entry => (
+        {sortedEntries.map(entry => (
           <div
             key={entry.id}
             className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"

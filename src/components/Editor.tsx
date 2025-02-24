@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '../store/useStore';
@@ -23,6 +23,8 @@ export default function Editor() {
     updatedAt: new Date().toISOString()
   });
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   useEffect(() => {
     if (id) {
       const existingEntry = entries.find(e => e.id === id);
@@ -36,6 +38,23 @@ export default function Editor() {
       });
     }
   }, [id, entries]);
+
+  useEffect(() => {
+    const adjustTextareaHeight = () => {
+      if (textareaRef.current) {
+        const textarea = textareaRef.current;
+        textarea.style.height = 'auto'; // Reset height to recalculate
+        textarea.style.height = `${textarea.scrollHeight}px`; // Set height to scrollHeight
+      }
+    };
+
+    adjustTextareaHeight();
+    window.addEventListener('resize', adjustTextareaHeight);
+
+    return () => {
+      window.removeEventListener('resize', adjustTextareaHeight);
+    };
+  }, [entry.content]);
 
   const handleSave = async () => {
     const now = new Date().toISOString();
@@ -53,7 +72,7 @@ export default function Editor() {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 h-[calc(100vh-5rem)] flex flex-col">
       <input
         type="text"
         value={entry.title}
@@ -74,10 +93,12 @@ export default function Editor() {
       </div>
 
       <textarea
+        ref={textareaRef}
         value={entry.content}
         onChange={(e) => setEntry({ ...entry, content: e.target.value })}
         placeholder="Write your thoughts..."
-        className="w-full h-96 mb-4 p-4 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white resize-none"
+        className="w-full flex-1 mb-4 p-4 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white resize-none"
+        style={{ height: 'calc(100vh - 16rem)' }}
       />
 
       <button

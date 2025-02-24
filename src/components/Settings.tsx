@@ -1,20 +1,76 @@
 import React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { db } from '../lib/db';
 
 export default function Settings() {
-  const { preferences, updatePreferences } = useStore();
+  const { preferences, updatePreferences, entries, loadEntries } = useStore();
 
   const toggleTheme = () => {
     updatePreferences({ theme: preferences.theme === 'light' ? 'dark' : 'light' });
   };
 
-  return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-6 dark:text-white">Settings</h2>
+  const handleExportData = async () => {
+    const exportData = {
+      entries: entries,
+      preferences: preferences,
+      exportDate: new Date().toISOString()
+    };
 
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+    const jsonString = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `journal-backup-${new Date().toISOString().split('T')[0]}.json`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportData = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const importData = JSON.parse(text);
+
+      if (!importData.entries || !Array.isArray(importData.entries)) {
+        throw new Error('Invalid data format');
+      }
+
+      const entriesStore = db.transaction('journal_entries', 'readwrite').objectStore('journal_entries');
+      await entriesStore.clear();
+
+      for (const entry of importData.entries) {
+        await db.add('journal_entries', entry);
+      }
+
+      if (importData.preferences) {
+        await updatePreferences(importData.preferences);
+      }
+
+      await loadEntries();
+
+      alert('Data imported successfully!');
+    } catch (error) {
+      console.error('Import error:', error);
+      alert('Error importing data. Please check the file format.');
+    }
+
+    event.target.value = '';
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto p-4">
+      <h1 className="text-4xl font-bold mb-8 dark:text-white">Settings</h1>
+      
+      <div className="space-y-8">
+      <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-medium dark:text-white">Theme</h3>
             <p className="text-gray-500 dark:text-gray-400">Toggle between light and dark mode</p>
@@ -24,36 +80,33 @@ export default function Settings() {
             className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700"
           >
             {preferences.theme === 'light' ? (
-              <Moon className="w-6 h-6 text-gray-600 dark:text-gray-300" />
-            ) : (
               <Sun className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+            ) : (
+              <Moon className="w-6 h-6 text-gray-600 dark:text-gray-300" />
             )}
           </button>
         </div>
 
-        <div>
-          <h3 className="text-lg font-medium mb-2 dark:text-white">Sort Entries</h3>
-          <select
-            value={preferences.sortBy}
-            onChange={(e) => updatePreferences({ sortBy: e.target.value as 'date' | 'color' | 'length' })}
-            className="w-full p-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-          >
-            <option value="date">Date</option>
-            <option value="color">Color</option>
-            <option value="length">Length</option>
-          </select>
-        </div>
-
-        <div>
-          <h3 className="text-lg font-medium mb-2 dark:text-white">Sort Order</h3>
-          <select
-            value={preferences.sortOrder}
-            onChange={(e) => updatePreferences({ sortOrder: e.target.value as 'asc' | 'desc' })}
-            className="w-full p-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-          >
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
-          </select>
+        <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4 dark:text-white">Database Management</h2>
+          <div className="space-y-4">
+            <button
+              onClick={handleExportData}
+              className="w-full p-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              Export Database
+            </button>
+            
+            <label className="block w-full p-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-center cursor-pointer">
+              Import Database
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImportData}
+                className="hidden"
+              />
+            </label>
+          </div>
         </div>
       </div>
     </div>

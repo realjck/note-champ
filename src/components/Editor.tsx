@@ -5,9 +5,9 @@ import { useStore } from '../store/useStore';
 import type { JournalEntry } from '../types';
 
 const COLORS = [
-  '#FF6B6B', '#4ECDC4', '#45B7D1',
-  '#96CEB4', '#FFEEAD', '#D4A5A5',
-  '#9B59B6', '#3498DB', '#2ECC71'
+  '#FF6B6B', '#4ECDC4', '#3498DB',
+  '#FFEEAD', '#D4A5A5', '#9B59B6',
+  '#2ECC71'
 ];
 
 export default function Editor() {

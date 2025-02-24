@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { Search, Trash2, Edit2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import DeleteModal from './DeleteModal';
@@ -54,9 +55,9 @@ export default function EntryList() {
           >
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-semibold text-lg dark:text-white">{entry.title}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {format(new Date(entry.createdAt), 'PPP')}
+                <h3 className="font-semibold text-lg dark:text-white mb-2">{entry.title}</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {format(new Date(entry.createdAt), 'PPP', { locale:fr })}
                 </p>
               </div>
               <div className="flex space-x-2">

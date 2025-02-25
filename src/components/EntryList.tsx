@@ -77,7 +77,7 @@ export default function EntryList() {
             placeholder="Rechercher..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-10 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            className="w-full pl-10 pr-10 py-2 h-12 -mt-1 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           />
           {search && (
             <button

@@ -78,7 +78,7 @@ export default function Editor() {
         value={entry.title}
         onChange={(e) => setEntry({ ...entry, title: e.target.value })}
         placeholder="Titre"
-        className="w-full mb-4 p-2 text-xl font-semibold rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+        className="w-full mb-4 p-2 h-12 -mt-1 text-xl font-semibold rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white"
       />
 
       <div className="mb-4 flex space-x-3">

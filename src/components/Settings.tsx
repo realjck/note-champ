@@ -77,7 +77,7 @@ export default function Settings() {
           </div>
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700"
+            className="p-2 rounded-lg bg-white dark:bg-gray-700"
           >
             {preferences.theme === 'light' ? (
               <Sun className="w-8 h-8 text-gray-600 dark:text-gray-300" />

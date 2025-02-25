@@ -81,7 +81,7 @@ export default function Editor() {
         className="w-full mb-4 p-2 text-xl font-semibold rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white"
       />
 
-      <div className="mb-4 flex space-x-2">
+      <div className="mb-4 flex space-x-3">
         {COLORS.map(color => (
           <button
             key={color}
@@ -97,13 +97,13 @@ export default function Editor() {
         value={entry.content}
         onChange={(e) => setEntry({ ...entry, content: e.target.value })}
         placeholder="Écrivez votre note..."
-        className="w-full flex-1 mb-4 p-4 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white resize-none"
+        className="text-xl w-full flex-1 mb-4 p-4 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white resize-none"
         style={{ height: 'calc(100vh - 16rem)' }}
       />
 
       <button
         onClick={handleSave}
-        className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        className="text-xl w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
         Enregistrer
       </button>

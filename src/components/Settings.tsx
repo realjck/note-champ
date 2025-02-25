@@ -72,8 +72,8 @@ export default function Settings() {
       <div className="space-y-8">
       <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-medium dark:text-white">Thème</h3>
-            <p className="text-gray-500 dark:text-gray-400">Mode clair / Mode sombre</p>
+            <h3 className="text-xl font-medium dark:text-white">Thème</h3>
+            <p className="text-lg text-gray-500 dark:text-gray-400">Mode clair / Mode sombre</p>
           </div>
           <button
             onClick={toggleTheme}
@@ -92,12 +92,12 @@ export default function Settings() {
           <div className="space-y-4">
             <button
               onClick={handleExportData}
-              className="w-full p-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="text-lg w-full p-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               Exporter le journal
             </button>
             
-            <label className="block w-full p-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-center cursor-pointer">
+            <label className="text-lg block w-full p-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-center cursor-pointer">
               Importer le journal
               <input
                 type="file"

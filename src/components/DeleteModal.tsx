@@ -22,7 +22,7 @@ export default function DeleteModal({ isOpen, onClose, onConfirm, title }: Delet
         </button>
         
         <h3 className="text-xl font-semibold mb-4 dark:text-white">Effacer la note</h3>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
+        <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
           Êtes-vous sûr(e) de vouloir supprimer "{title}"&nbsp;?
         </p>
         

@@ -18,7 +18,7 @@ export default function Navigation() {
               location.pathname === '/' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'
             }`}
           >
-            <Book className="w-6 h-6" />
+            <Book className="w-7 h-7" />
           </button>
           <button
             onClick={() => navigate('/new')}
@@ -31,7 +31,7 @@ export default function Navigation() {
                 : 'text-gray-600 dark:text-gray-400'
             }`}
           >
-            <PlusCircle className="w-6 h-6" />
+            <PlusCircle className="w-7 h-7" />
           </button>
           <button
             onClick={() => navigate('/settings')}
@@ -39,7 +39,7 @@ export default function Navigation() {
               location.pathname === '/settings' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'
             }`}
           >
-            <Settings className="w-6 h-6" />
+            <Settings className="w-7 h-7" />
           </button>
         </div>
       </div>

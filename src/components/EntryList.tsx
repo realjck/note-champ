@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Search, Trash2, Edit2, X, PlusCircle } from 'lucide-react';
@@ -8,10 +8,27 @@ import DeleteModal from './DeleteModal';
 
 export default function EntryList() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { entries, deleteEntry, preferences } = useStore();
   const [search, setSearch] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<{ id: string; title: string } | null>(null);
+
+  // Restaurer la position du scroll au chargement
+  useEffect(() => {
+    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+    if (savedScrollPosition !== null) {
+      window.scrollTo(0, parseInt(savedScrollPosition));
+      sessionStorage.removeItem('scrollPosition');
+    }
+  }, []);
+
+  // Sauvegarder la position du scroll avant de naviguer
+  const handleNavigate = (path: string) => {
+    const scrollPosition = window.scrollY || document.documentElement.scrollTop;
+    sessionStorage.setItem('scrollPosition', scrollPosition.toString());
+    navigate(path);
+  };
 
   const filteredEntries = entries.filter(entry => 
     entry.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -85,7 +102,7 @@ export default function EntryList() {
                 </div>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => navigate(`/edit/${entry.id}`)}
+                    onClick={() => handleNavigate(`/edit/${entry.id}`)}
                     className="p-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
                   >
                     <Edit2 className="w-5 h-5" />

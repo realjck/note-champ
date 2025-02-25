@@ -5,6 +5,7 @@ import { fr } from 'date-fns/locale';
 import { Search, Trash2, Edit2, X, PlusCircle } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import DeleteModal from './DeleteModal';
+import logo from '../assets/images/logo.png';
 
 export default function EntryList() {
   const navigate = useNavigate();
@@ -81,10 +82,18 @@ export default function EntryList() {
 
       <div className="mt-4 space-y-4">
         {entries.length === 0 ? (
-          <div className="flex flex-col items-center text-center justify-center h-[calc(100vh-12rem)] text-gray-500 dark:text-gray-400">
-            <p className="text-xl">
-              Cliquez sur <PlusCircle className="w-6 h-6 inline mx-1" /> pour créer une nouvelle note
-            </p>
+          <div className="flex flex-col items-center justify-center text-center h-[calc(100vh-12rem)]">
+            <div className="flex items-center mb-4">
+              <img src={logo} alt="Logo" className="w-12 h-12 mr-2" />
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+                NoteChamp
+              </h1>
+            </div>
+            <div className="text-gray-500 dark:text-gray-400">
+              <p className="text-xl">
+                Cliquez sur <PlusCircle className="w-6 h-6 inline mx-1" /> pour créer une nouvelle note
+              </p>
+            </div>
           </div>
         ) : (
           sortedEntries.map(entry => (

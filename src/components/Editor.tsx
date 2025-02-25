@@ -6,7 +6,7 @@ import type { JournalEntry } from '../types';
 
 const COLORS = [
   '#FF6B6B', '#4ECDC4', '#3498DB',
-  '#FFEEAD', '#D4A5A5', '#9B59B6',
+  '#f5d222', '#D4A5A5', '#9B59B6',
   '#2ECC71'
 ];
 

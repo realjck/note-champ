@@ -21,9 +21,9 @@ export default function DeleteModal({ isOpen, onClose, onConfirm, title }: Delet
           <X className="w-5 h-5" />
         </button>
         
-        <h3 className="text-xl font-semibold mb-4 dark:text-white">Delete Entry</h3>
+        <h3 className="text-xl font-semibold mb-4 dark:text-white">Effacer la note</h3>
         <p className="text-gray-600 dark:text-gray-300 mb-6">
-          Are you sure you want to delete "{title}"? This action cannot be undone.
+          Êtes-vous sûr(e) de vouloir supprimer "{title}"&nbsp;?
         </p>
         
         <div className="flex space-x-4">

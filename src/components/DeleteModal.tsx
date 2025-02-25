@@ -31,13 +31,13 @@ export default function DeleteModal({ isOpen, onClose, onConfirm, title }: Delet
             onClick={onClose}
             className="flex-1 py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
           >
-            Cancel
+            Annuler
           </button>
           <button
             onClick={onConfirm}
             className="flex-1 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700"
           >
-            Delete
+            Effacer
           </button>
         </div>
       </div>

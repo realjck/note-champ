@@ -8,8 +8,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'MémoChamp',
-        short_name: 'MémoChamp',
+        name: 'NoteChamp',
+        short_name: 'NoteChamp',
         description: 'Practical mobile journaling app for capturing daily thoughts and memories effortlessly',
         theme_color: '#000000',
         icons: [

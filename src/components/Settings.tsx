@@ -23,7 +23,7 @@ export default function Settings() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `memochamp-backup-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `notechamp-backup-${new Date().toISOString().split('T')[0]}.json`;
     
     document.body.appendChild(link);
     link.click();

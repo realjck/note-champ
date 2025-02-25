@@ -8,9 +8,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Mobile Journal',
-        short_name: 'Journal',
-        description: 'A mobile-first journal application',
+        name: 'MemoChamp',
+        short_name: 'MemoChamp',
+        description: 'Practical mobile journaling app for capturing daily thoughts and memories effortlessly',
         theme_color: '#ffffff',
         icons: [
           {

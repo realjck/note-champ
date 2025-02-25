@@ -23,7 +23,7 @@ export default function Settings() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `journal-backup-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `memochamp-backup-${new Date().toISOString().split('T')[0]}.json`;
     
     document.body.appendChild(link);
     link.click();
@@ -67,38 +67,38 @@ export default function Settings() {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <h1 className="text-4xl font-bold mb-8 dark:text-white">Settings</h1>
+      <h1 className="text-4xl font-bold mb-8 dark:text-white">Paramètres</h1>
       
       <div className="space-y-8">
       <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-medium dark:text-white">Theme</h3>
-            <p className="text-gray-500 dark:text-gray-400">Toggle between light and dark mode</p>
+            <h3 className="text-lg font-medium dark:text-white">Thème</h3>
+            <p className="text-gray-500 dark:text-gray-400">Mode clair / Mode sombre</p>
           </div>
           <button
             onClick={toggleTheme}
             className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700"
           >
             {preferences.theme === 'light' ? (
-              <Sun className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+              <Sun className="w-8 h-8 text-gray-600 dark:text-gray-300" />
             ) : (
-              <Moon className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+              <Moon className="w-8 h-8 text-gray-600 dark:text-gray-300" />
             )}
           </button>
         </div>
 
         <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4 dark:text-white">Database Management</h2>
+          <h2 className="text-xl font-semibold mb-4 dark:text-white">Gestion des données</h2>
           <div className="space-y-4">
             <button
               onClick={handleExportData}
               className="w-full p-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
-              Export Database
+              Exporter le journal
             </button>
             
             <label className="block w-full p-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-center cursor-pointer">
-              Import Database
+              Importer le journal
               <input
                 type="file"
                 accept=".json"

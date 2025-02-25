@@ -19,7 +19,7 @@ function App() {
       v7_startTransition: true,
       v7_relativeSplatPath: true 
     }}>
-      <div className={`min-h-screen ${preferences.theme === 'dark' ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
+      <div className={`min-h-screen ${preferences.theme === 'dark' ? 'dark bg-gray-900' : 'bg-gray-100'}`}>
         <div className="max-w-2xl mx-auto pb-20">
           <Routes>
             <Route path="/" element={<EntryList />} />

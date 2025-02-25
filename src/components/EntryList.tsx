@@ -41,7 +41,7 @@ export default function EntryList() {
 
   return (
     <div className="p-4">
-      <div className="sticky top-0 bg-gray-50 dark:bg-gray-900 py-2">
+      <div className="sticky top-0 bg-gray-100 dark:bg-gray-900 py-2">
         <div className="relative">
           <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
           <input

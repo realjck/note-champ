@@ -80,7 +80,7 @@ export default function EntryList() {
       </div>
 
       <div className="mt-4 space-y-4">
-        {sortedEntries.length === 0 ? (
+        {entries.length === 0 ? (
           <div className="flex flex-col items-center text-center justify-center h-[calc(100vh-12rem)] text-gray-500 dark:text-gray-400">
             <p className="text-xl">
               Cliquez sur <PlusCircle className="w-6 h-6 inline mx-1" /> pour créer une nouvelle note
@@ -91,7 +91,7 @@ export default function EntryList() {
             <div
               key={entry.id}
               className="bg-white dark:bg-gray-800 rounded-lg shadow p-3"
-              style={{ borderLeft: `6px solid ${entry.color}` }}
+              style={{ borderLeft: `8px solid ${entry.color}` }}
             >
               <div className="flex justify-between items-start">
                 <div>

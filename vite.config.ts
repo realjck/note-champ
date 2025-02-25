@@ -11,7 +11,7 @@ export default defineConfig({
         name: 'MémoChamp',
         short_name: 'MémoChamp',
         description: 'Practical mobile journaling app for capturing daily thoughts and memories effortlessly',
-        theme_color: '#ffffff',
+        theme_color: '#000000',
         icons: [
           {
             src: '/pwa-192x192.png',

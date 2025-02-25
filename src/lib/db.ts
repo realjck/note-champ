@@ -22,7 +22,5 @@ export const db = await openDB<{
 });
 
 export const defaultPreferences: UserPreferences = {
-  theme: 'light',
-  sortBy: 'date',
-  sortOrder: 'desc',
+  theme: 'light'
 };

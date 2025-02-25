@@ -9,6 +9,4 @@ export interface JournalEntry {
 
 export interface UserPreferences {
   theme: 'light' | 'dark';
-  sortBy: 'date' | 'color' | 'length';
-  sortOrder: 'asc' | 'desc';
 }

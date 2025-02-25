@@ -73,8 +73,8 @@ export default function EntryList() {
           sortedEntries.map(entry => (
             <div
               key={entry.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
-              style={{ borderLeft: `4px solid ${entry.color}` }}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow p-3"
+              style={{ borderLeft: `6px solid ${entry.color}` }}
             >
               <div className="flex justify-between items-start">
                 <div>

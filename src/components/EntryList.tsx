@@ -140,7 +140,7 @@ export default function EntryList() {
                       </button>
                     </div>
                   </div>
-                  <p className="mt-2 text-lg text-gray-600 dark:text-gray-300 line-clamp-3">
+                  <p className="mt-2 text-lg pb-1 -mb-1 text-gray-600 dark:text-gray-300 line-clamp-3">
                     {entry.content}
                   </p>
                 </div>

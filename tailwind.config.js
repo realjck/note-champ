@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Playwrite US Modern', 'sans-serif'],
+        sans: ['Playwrite US Modern Variable', 'sans-serif'],
       },
     },
   },

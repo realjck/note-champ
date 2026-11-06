@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
+import '@fontsource-variable/playwrite-us-modern';
 import './index.css';
 import { initialize } from './lib/db';
 import { requestPersistentStorage } from './lib/storage';

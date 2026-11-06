@@ -7,12 +7,13 @@ interface State {
   preferences: UserPreferences;
   isLoading: boolean;
   loadEntries: () => Promise<void>;
-  addEntry: (entry: JournalEntry) => Promise<void>;
-  updateEntry: (entry: JournalEntry) => Promise<void>;
+  saveEntry: (entry: JournalEntry) => Promise<void>;
   deleteEntry: (id: string) => Promise<void>;
   loadPreferences: () => Promise<void>;
   updatePreferences: (prefs: Partial<UserPreferences>) => Promise<void>;
 }
+
+const isBlank = (entry: JournalEntry) => !entry.title.trim() && !entry.content.trim();
 
 export const useStore = create<State>((set, get) => ({
   entries: [],
@@ -24,14 +25,14 @@ export const useStore = create<State>((set, get) => ({
     set({ entries, isLoading: false });
   },
 
-  addEntry: async (entry) => {
-    await db.add('journal_entries', entry);
-    get().loadEntries();
-  },
-
-  updateEntry: async (entry) => {
-    await db.put('journal_entries', entry);
-    get().loadEntries();
+  /** Creates or updates the entry; a blank entry is removed instead of stored. */
+  saveEntry: async (entry) => {
+    if (isBlank(entry)) {
+      await db.delete('journal_entries', entry.id);
+    } else {
+      await db.put('journal_entries', entry);
+    }
+    await get().loadEntries();
   },
 
   deleteEntry: async (id) => {

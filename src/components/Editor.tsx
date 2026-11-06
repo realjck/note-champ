@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '../store/useStore';
+import { useDebouncedSave } from '../hooks/useDebouncedSave';
 import type { JournalEntry } from '../types';
 
 const COLORS = [
@@ -10,34 +11,30 @@ const COLORS = [
   '#2ECC71'
 ];
 
+const AUTOSAVE_DELAY_MS = 500;
+
+type EditableFields = Partial<Pick<JournalEntry, 'title' | 'content' | 'color'>>;
+
+const createEntry = (): JournalEntry => {
+  const now = new Date().toISOString();
+  return { id: uuidv4(), title: '', content: '', color: COLORS[0], createdAt: now, updatedAt: now };
+};
+
 export default function Editor() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { entries, addEntry, updateEntry } = useStore();
-  const [entry, setEntry] = useState<JournalEntry>({
-    id: '',
-    title: '',
-    content: '',
-    color: COLORS[0],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  });
+  const { entries, isLoading, saveEntry } = useStore();
+  const [entry, setEntry] = useState<JournalEntry | null>(() => (id ? null : createEntry()));
+  const { schedule, flush } = useDebouncedSave(saveEntry, AUTOSAVE_DELAY_MS);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Load the edited note once: later store reloads (after each autosave) must not overwrite typing.
   useEffect(() => {
-    if (id) {
-      const existingEntry = entries.find(e => e.id === id);
-      if (existingEntry) {
-        setEntry(existingEntry);
-      }
-    } else {
-      setEntry({
-        ...entry,
-        id: uuidv4()
-      });
-    }
-  }, [id, entries]);
+    if (entry || isLoading) return;
+    const existingEntry = entries.find(e => e.id === id);
+    if (existingEntry) setEntry(existingEntry);
+  }, [entry, entries, id, isLoading]);
 
   useEffect(() => {
     const adjustTextareaHeight = () => {
@@ -54,20 +51,18 @@ export default function Editor() {
     return () => {
       window.removeEventListener('resize', adjustTextareaHeight);
     };
-  }, [entry.content]);
+  }, [entry?.content]);
 
-  const handleSave = async () => {
-    const now = new Date().toISOString();
-    const updatedEntry = {
-      ...entry,
-      updatedAt: now
-    };
+  if (!entry) return null;
 
-    if (id) {
-      await updateEntry(updatedEntry);
-    } else {
-      await addEntry(updatedEntry);
-    }
+  const update = (changes: EditableFields) => {
+    const next = { ...entry, ...changes, updatedAt: new Date().toISOString() };
+    setEntry(next);
+    schedule(next);
+  };
+
+  const handleDone = async () => {
+    await flush();
     navigate('/');
   };
 
@@ -76,7 +71,7 @@ export default function Editor() {
       <input
         type="text"
         value={entry.title}
-        onChange={(e) => setEntry({ ...entry, title: e.target.value })}
+        onChange={(e) => update({ title: e.target.value })}
         placeholder="Titre"
         className="w-full mb-4 p-2 h-12 -mt-1 text-xl font-semibold rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white"
       />
@@ -85,7 +80,7 @@ export default function Editor() {
         {COLORS.map(color => (
           <button
             key={color}
-            onClick={() => setEntry({ ...entry, color })}
+            onClick={() => update({ color })}
             className={`w-8 h-8 rounded-full ${entry.color === color ? 'ring-2 ring-offset-2 ring-blue-500' : ''}`}
             style={{ backgroundColor: color }}
           />
@@ -95,17 +90,17 @@ export default function Editor() {
       <textarea
         ref={textareaRef}
         value={entry.content}
-        onChange={(e) => setEntry({ ...entry, content: e.target.value })}
+        onChange={(e) => update({ content: e.target.value })}
         placeholder="Écrivez votre note..."
         className="text-xl w-full flex-1 mb-4 p-4 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white resize-none"
         style={{ height: 'calc(100vh - 16rem)' }}
       />
 
       <button
-        onClick={handleSave}
+        onClick={handleDone}
         className="text-xl w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
-        Enregistrer
+        Terminé
       </button>
     </div>
   );

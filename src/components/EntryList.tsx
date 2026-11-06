@@ -10,20 +10,10 @@ import logo from '../assets/images/logo.png';
 export default function EntryList() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { entries, deleteEntry, preferences } = useStore();
+  const { entries, isLoading, deleteEntry, preferences } = useStore();
   const [search, setSearch] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<{ id: string; title: string } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Gérer le chargement initial
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, [entries]);
 
   // Restaurer la position du scroll au chargement
   useEffect(() => {
@@ -93,7 +83,11 @@ export default function EntryList() {
       <div className="mt-4 space-y-4">
         {isLoading ? (
           <div className="flex justify-center items-center h-[calc(100vh-12rem)]">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+            <div
+              role="status"
+              aria-label="Chargement"
+              className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"
+            ></div>
           </div>
         ) : (
           <>

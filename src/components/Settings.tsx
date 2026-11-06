@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { db } from '../lib/db';
+import { parseBackup, restoreBackup, type Backup } from '../lib/backup';
+import ConfirmModal from './ConfirmModal';
 
 export default function Settings() {
-  const { preferences, updatePreferences, entries, loadEntries } = useStore();
+  const { preferences, updatePreferences, entries, loadEntries, loadPreferences } = useStore();
+  const [pendingBackup, setPendingBackup] = useState<Backup | null>(null);
+  const [notice, setNotice] = useState<{ title: string; message: string } | null>(null);
 
   const toggleTheme = () => {
     updatePreferences({ theme: preferences.theme === 'light' ? 'dark' : 'light' });
@@ -36,33 +40,33 @@ export default function Settings() {
     if (!file) return;
 
     try {
-      const text = await file.text();
-      const importData = JSON.parse(text);
-
-      if (!importData.entries || !Array.isArray(importData.entries)) {
-        throw new Error('Invalid data format');
-      }
-
-      const entriesStore = db.transaction('journal_entries', 'readwrite').objectStore('journal_entries');
-      await entriesStore.clear();
-
-      for (const entry of importData.entries) {
-        await db.add('journal_entries', entry);
-      }
-
-      if (importData.preferences) {
-        await updatePreferences(importData.preferences);
-      }
-
-      await loadEntries();
-
-      alert('Data imported successfully!');
+      setPendingBackup(parseBackup(await file.text()));
     } catch (error) {
-      console.error('Import error:', error);
-      alert('Error importing data. Please check the file format.');
+      showImportError(error);
     }
 
     event.target.value = '';
+  };
+
+  const handleImportConfirm = async () => {
+    if (!pendingBackup) return;
+    setPendingBackup(null);
+    try {
+      await restoreBackup(db, pendingBackup);
+      await Promise.all([loadEntries(), loadPreferences()]);
+      setNotice({ title: 'Import terminé', message: 'Journal importé avec succès.' });
+    } catch (error) {
+      showImportError(error);
+    }
+  };
+
+  const showImportError = (error: unknown) => {
+    console.error('Import error:', error);
+    const reason = error instanceof Error ? `\n${error.message}` : '';
+    setNotice({
+      title: 'Import impossible',
+      message: `Vos notes n'ont pas été modifiées.${reason}`,
+    });
   };
 
   return (
@@ -109,6 +113,26 @@ export default function Settings() {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={pendingBackup !== null}
+        title="Importer le journal"
+        message={`Remplacer vos ${entries.length} note(s) actuelle(s) par les ${pendingBackup?.entries.length ?? 0} note(s) du fichier ?`}
+        confirmLabel="Remplacer"
+        cancelLabel="Annuler"
+        tone="danger"
+        onConfirm={handleImportConfirm}
+        onClose={() => setPendingBackup(null)}
+      />
+
+      <ConfirmModal
+        isOpen={notice !== null}
+        title={notice?.title ?? ''}
+        message={notice?.message ?? ''}
+        confirmLabel="OK"
+        onConfirm={() => setNotice(null)}
+        onClose={() => setNotice(null)}
+      />
     </div>
   );
 }

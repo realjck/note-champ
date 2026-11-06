@@ -1,26 +1,29 @@
-import { openDB } from 'idb';
+import { openDB, type OpenDBCallbacks } from 'idb';
 import type { JournalEntry, UserPreferences } from '../types';
 
 const DB_NAME = 'journal_db';
 const DB_VERSION = 1;
 
-// Au lieu d'utiliser top-level await, créons une fonction d'initialisation
-export const initDB = () => openDB<{
+type Schema = {
   journal_entries: JournalEntry;
   preferences: UserPreferences;
-}>(DB_NAME, DB_VERSION, {
-  upgrade(db) {
-    // Journal entries store
+};
+
+/** Chaque étape migre depuis la version précédente : ajouter les suivantes en dessous, sous la forme `if (oldVersion < N)`. */
+export const upgrade: OpenDBCallbacks<Schema>['upgrade'] = (db, oldVersion) => {
+  if (oldVersion < 1) {
     const journalStore = db.createObjectStore('journal_entries', {
       keyPath: 'id',
     });
     journalStore.createIndex('createdAt', 'createdAt');
     journalStore.createIndex('color', 'color');
 
-    // Preferences store
     db.createObjectStore('preferences');
-  },
-});
+  }
+};
+
+// Au lieu d'utiliser top-level await, créons une fonction d'initialisation
+export const initDB = () => openDB<Schema>(DB_NAME, DB_VERSION, { upgrade });
 
 export const defaultPreferences: UserPreferences = {
   theme: 'light'

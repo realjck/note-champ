@@ -29,7 +29,8 @@ export default function Editor() {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load the edited note once: later store reloads (after each autosave) must not overwrite typing.
+  // Charge la note une seule fois : les rechargements du store (après chaque sauvegarde auto)
+  // ne doivent pas écraser la saisie en cours.
   useEffect(() => {
     if (entry || isLoading) return;
     const existingEntry = entries.find(e => e.id === id);
@@ -44,8 +45,8 @@ export default function Editor() {
     const adjustTextareaHeight = () => {
       if (textareaRef.current) {
         const textarea = textareaRef.current;
-        textarea.style.height = 'auto'; // Reset height to recalculate
-        textarea.style.height = `${textarea.scrollHeight}px`; // Set height to scrollHeight
+        textarea.style.height = 'auto'; // Réinitialise la hauteur pour la recalculer
+        textarea.style.height = `${textarea.scrollHeight}px`; // Ajuste la hauteur au contenu
       }
     };
 

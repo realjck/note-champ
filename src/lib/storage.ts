@@ -1,8 +1,8 @@
 type PersistableStorage = Partial<Pick<StorageManager, 'persisted' | 'persist'>>;
 
 /**
- * Asks the browser not to evict our IndexedDB data (storage pressure, or
- * Safari's 7-day inactivity rule). Resolves to whether storage is persistent.
+ * Demande au navigateur de ne pas effacer nos données IndexedDB (manque d'espace,
+ * ou règle des 7 jours d'inactivité de Safari). Renvoie true si le stockage est persistant.
  */
 export async function requestPersistentStorage(
   storage: PersistableStorage | undefined

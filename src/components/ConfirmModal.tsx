@@ -6,7 +6,7 @@ interface ConfirmModalProps {
   title: string;
   message: ReactNode;
   confirmLabel: string;
-  /** Without a cancel label, the modal is a simple notice with a single button. */
+  /** Sans libellé d'annulation, la modale devient un simple message avec un seul bouton. */
   cancelLabel?: string;
   tone?: 'primary' | 'danger';
   onConfirm: () => void;

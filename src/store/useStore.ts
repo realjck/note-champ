@@ -25,7 +25,7 @@ export const useStore = create<State>((set, get) => ({
     set({ entries, isLoading: false });
   },
 
-  /** Creates or updates the entry; a blank entry is removed instead of stored. */
+  /** Crée ou met à jour la note ; une note vide est supprimée au lieu d'être enregistrée. */
   saveEntry: async (entry) => {
     if (isBlank(entry)) {
       await db.delete('journal_entries', entry.id);

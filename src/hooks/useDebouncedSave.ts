@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 /**
- * Delays saves until changes pause, and flushes any pending save when the
- * component unmounts or the page is hidden (app switched, screen locked).
+ * Retarde la sauvegarde jusqu'à une pause dans les modifications, et force la
+ * sauvegarde en attente au démontage du composant ou quand la page est masquée
+ * (changement d'appli, écran verrouillé).
  */
 export function useDebouncedSave<T>(save: (value: T) => Promise<void>, delayMs: number) {
   const pending = useRef<{ value: T } | null>(null);

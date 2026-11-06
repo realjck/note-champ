@@ -46,7 +46,7 @@ function toPreferences(value: unknown): UserPreferences {
   return { theme: value.theme as UserPreferences['theme'] };
 }
 
-/** Validates an exported backup file and returns only the known fields. */
+/** Valide un fichier de sauvegarde exporté et ne renvoie que les champs connus. */
 export function parseBackup(text: string): Backup {
   const data: unknown = JSON.parse(text);
   if (!isRecord(data) || !Array.isArray(data.entries)) {
@@ -64,11 +64,11 @@ export function parseBackup(text: string): Backup {
   return backup;
 }
 
-/** Replaces all stored data in a single transaction: on failure nothing is changed. */
+/** Remplace toutes les données en une seule transaction : en cas d'échec, rien n'est modifié. */
 export async function restoreBackup(db: typeof Database, backup: Backup): Promise<void> {
   const tx = db.transaction(['journal_entries', 'preferences'], 'readwrite');
   const entriesStore = tx.objectStore('journal_entries');
-  // A failing request aborts the whole transaction, which rolls back the clear().
+  // Une requête en échec annule toute la transaction, y compris le clear().
   await Promise.all([
     entriesStore.clear(),
     ...backup.entries.map((entry) => entriesStore.add(entry)),

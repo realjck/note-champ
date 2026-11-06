@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react';
 import { X } from 'lucide-react';
 
 interface ConfirmModalProps {
   isOpen: boolean;
   title: string;
-  message: string;
+  message: ReactNode;
   confirmLabel: string;
   /** Without a cancel label, the modal is a simple notice with a single button. */
   cancelLabel?: string;

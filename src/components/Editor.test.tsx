@@ -131,6 +131,13 @@ describe('Editor autosave on an existing note', () => {
     );
   });
 
+  it('returns to the list when the note does not exist', async () => {
+    renderEditor('/edit/missing');
+
+    await screen.findByText('Liste des notes');
+    expect((await storedEntries()).map((e) => e.id)).toEqual(['existing']);
+  });
+
   it('deletes the note when it is emptied', async () => {
     const { unmount } = renderEditor('/edit/existing');
     fireEvent.change(screen.getByPlaceholderText('Titre'), { target: { value: '' } });

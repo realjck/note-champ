@@ -33,8 +33,12 @@ export default function Editor() {
   useEffect(() => {
     if (entry || isLoading) return;
     const existingEntry = entries.find(e => e.id === id);
-    if (existingEntry) setEntry(existingEntry);
-  }, [entry, entries, id, isLoading]);
+    if (existingEntry) {
+      setEntry(existingEntry);
+    } else {
+      navigate('/', { replace: true });
+    }
+  }, [entry, entries, id, isLoading, navigate]);
 
   useEffect(() => {
     const adjustTextareaHeight = () => {

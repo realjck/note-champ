@@ -252,6 +252,17 @@ describe('Éditeur : photos', () => {
       expect(currentSlide()?.getAttribute('aria-label')).toBe('Photo 2 sur 2');
     });
 
+    it("n'affiche pas de flèches de navigation : on passe d'une photo à l'autre en glissant", async () => {
+      await addImage(existingEntry, { ...storedPhoto, id: 'photo-2', createdAt: '2026-01-01T10:00:01.000Z' });
+      renderEditor('/edit/existing');
+
+      fireEvent.click(await screen.findByRole('button', { name: 'Agrandir la photo 1' }));
+      await screen.findByRole('dialog', { name: 'Visionneuse de photos' });
+
+      expect(screen.queryByRole('button', { name: 'Photo précédente' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Photo suivante' })).toBeNull();
+    });
+
     it('ferme la visionneuse avec le bouton retour, sans quitter la note', async () => {
       renderEditor('/edit/existing');
       fireEvent.click(await screen.findByRole('button', { name: 'Agrandir la photo 1' }));

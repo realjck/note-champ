@@ -10,8 +10,6 @@ const LABELS = {
   Carousel: 'carrousel',
   Slide: 'photo',
   '{index} of {total}': 'Photo {index} sur {total}',
-  Previous: 'Photo précédente',
-  Next: 'Photo suivante',
   Close: 'Fermer',
   'Zoom in': 'Zoomer',
   'Zoom out': 'Dézoomer',
@@ -42,7 +40,6 @@ export default function PhotoViewer({ images, index, onClose }: PhotoViewerProps
   const urls = usePhotoUrls(images);
   if (urls.length !== images.length) return null;
 
-  const single = images.length === 1;
   const slides = images.map((image, i) => ({
     src: urls[i],
     width: image.width,
@@ -62,10 +59,8 @@ export default function PhotoViewer({ images, index, onClose }: PhotoViewerProps
       zoom={{ maxZoomPixelRatio: 3, scrollToZoom: true }}
       carousel={{ finite: true }}
       controller={{ closeOnPullDown: true, closeOnBackdropClick: true }}
-      render={{
-        buttonPrev: single ? () => null : undefined,
-        buttonNext: single ? () => null : undefined,
-      }}
+      // Pas de flèches : on passe d'une photo à l'autre en glissant (ou avec les flèches du clavier).
+      render={{ buttonPrev: () => null, buttonNext: () => null }}
     />
   );
 }

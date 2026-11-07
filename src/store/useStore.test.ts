@@ -33,8 +33,7 @@ beforeEach(async () => {
 
 describe('deleteEntry', () => {
   it('supprime aussi les photos de la note', async () => {
-    await db.put('journal_entries', entry());
-    await addImage(photo);
+    await addImage(entry(), photo);
 
     await useStore.getState().deleteEntry('note');
 
@@ -47,8 +46,7 @@ describe('saveEntry avec une note sans texte', () => {
   const blank = entry({ title: ' ', content: '' });
 
   it("garde la note si elle contient des photos", async () => {
-    await db.put('journal_entries', entry());
-    await addImage(photo);
+    await addImage(entry(), photo);
 
     await useStore.getState().saveEntry(blank);
 

@@ -2,7 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { useDebouncedSave } from '../hooks/useDebouncedSave';
-import type { JournalEntry } from '../types';
+import { useNoteImages } from '../hooks/useNoteImages';
+import ConfirmModal from './ConfirmModal';
+import PhotoStrip from './PhotoStrip';
+import type { JournalEntry, NoteImage } from '../types';
 
 const COLORS = [
   { value: '#FF6B6B', name: 'Rouge' },
@@ -29,6 +32,9 @@ export default function Editor() {
   const { entries, isLoading, saveEntry } = useStore();
   const [entry, setEntry] = useState<JournalEntry | null>(() => (id ? null : createEntry()));
   const { schedule, flush } = useDebouncedSave(saveEntry, AUTOSAVE_DELAY_MS);
+  const photos = useNoteImages(entry);
+  const [photoToDelete, setPhotoToDelete] = useState<NoteImage | null>(null);
+  const [photoErrors, setPhotoErrors] = useState<string[]>([]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -74,6 +80,18 @@ export default function Editor() {
     navigate('/');
   };
 
+  const handleAddPhotos = async (files: File[]) => {
+    setPhotoErrors(await photos.add(entry, files));
+  };
+
+  const handleDeletePhoto = async () => {
+    if (!photoToDelete) return;
+    await photos.remove(photoToDelete);
+    setPhotoToDelete(null);
+    // Applique la règle de la note vide, qui dépend aussi des photos.
+    schedule(entry);
+  };
+
   return (
     <div className="p-4 h-[calc(100vh-5rem)] flex flex-col">
       <input
@@ -106,12 +124,39 @@ export default function Editor() {
         style={{ height: 'calc(100vh - 16rem)' }}
       />
 
+      <PhotoStrip
+        images={photos.images}
+        isProcessing={photos.isProcessing}
+        onAdd={handleAddPhotos}
+        onDelete={setPhotoToDelete}
+      />
+
       <button
         onClick={handleDone}
         className="text-xl w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
         Terminé
       </button>
+
+      <ConfirmModal
+        isOpen={photoToDelete !== null}
+        title="Supprimer la photo"
+        message={<>Supprimer cette photo&nbsp;?</>}
+        confirmLabel="Supprimer"
+        cancelLabel="Annuler"
+        tone="danger"
+        onConfirm={handleDeletePhoto}
+        onClose={() => setPhotoToDelete(null)}
+      />
+
+      <ConfirmModal
+        isOpen={photoErrors.length > 0}
+        title={photoErrors.length > 1 ? 'Photos non ajoutées' : 'Photo non ajoutée'}
+        message={photoErrors.join('\n')}
+        confirmLabel="OK"
+        onConfirm={() => setPhotoErrors([])}
+        onClose={() => setPhotoErrors([])}
+      />
     </div>
   );
 }

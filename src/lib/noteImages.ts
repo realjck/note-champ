@@ -1,8 +1,19 @@
 import { db } from './db';
-import type { NoteImage } from '../types';
+import type { JournalEntry, NoteImage } from '../types';
 
-export async function addImage(image: NoteImage): Promise<void> {
-  await db.add('images', image);
+/**
+ * Enregistre la photo et, si elle n'existe pas encore, sa note, dans une seule
+ * transaction : aucune photo ne reste orpheline. Une note déjà enregistrée
+ * n'est pas remplacée, car la sauvegarde différée a pu en écrire une version
+ * plus récente pendant le traitement de la photo.
+ */
+export async function addImage(entry: JournalEntry, image: NoteImage): Promise<void> {
+  const tx = db.transaction(['journal_entries', 'images'], 'readwrite');
+  const entries = tx.objectStore('journal_entries');
+  const addEntryIfMissing = async () => {
+    if ((await entries.getKey(entry.id)) === undefined) await entries.add(entry);
+  };
+  await Promise.all([addEntryIfMissing(), tx.objectStore('images').add(image), tx.done]);
 }
 
 /** Photos d'une note, dans l'ordre d'ajout. */

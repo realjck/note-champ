@@ -1,9 +1,9 @@
 import 'fake-indexeddb/auto';
 import { IDBFactory } from 'fake-indexeddb';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { initialize } from './db';
+import { db, initialize } from './db';
 import { addImage, deleteImage, getImages } from './noteImages';
-import type { NoteImage } from '../types';
+import type { JournalEntry, NoteImage } from '../types';
 
 const image = (id: string, entryId: string, createdAt: string): NoteImage => ({
   id,
@@ -15,6 +15,15 @@ const image = (id: string, entryId: string, createdAt: string): NoteImage => ({
   createdAt,
 });
 
+const entry = (id: string): JournalEntry => ({
+  id,
+  title: '',
+  content: '',
+  color: '#FF6B6B',
+  createdAt: '2026-01-01T10:00:00.000Z',
+  updatedAt: '2026-01-01T10:00:00.000Z',
+});
+
 const ids = (images: NoteImage[]) => images.map((img) => img.id);
 
 beforeEach(async () => {
@@ -23,24 +32,39 @@ beforeEach(async () => {
 });
 
 describe('photos des notes', () => {
+  it('addImage enregistre aussi la note, pour ne pas laisser de photo orpheline', async () => {
+    await addImage(entry('note'), image('1', 'note', '2026-01-01T10:00:00.000Z'));
+
+    expect(await db.get('journal_entries', 'note')).toEqual(entry('note'));
+  });
+
+  it('addImage ne remplace pas une note déjà enregistrée, plus récente', async () => {
+    const newer = { ...entry('note'), content: 'Texte tapé pendant le traitement' };
+    await db.put('journal_entries', newer);
+
+    await addImage(entry('note'), image('1', 'note', '2026-01-01T10:00:00.000Z'));
+
+    expect(await db.get('journal_entries', 'note')).toEqual(newer);
+  });
+
   it("renvoie les photos d'une note dans l'ordre d'ajout", async () => {
     // Identifiants choisis pour que l'ordre des clés diffère de l'ordre d'ajout.
-    await addImage(image('z', 'note', '2026-01-01T10:00:00.000Z'));
-    await addImage(image('a', 'note', '2026-01-01T10:00:02.000Z'));
-    await addImage(image('m', 'note', '2026-01-01T10:00:01.000Z'));
+    await addImage(entry('note'), image('z', 'note', '2026-01-01T10:00:00.000Z'));
+    await addImage(entry('note'), image('a', 'note', '2026-01-01T10:00:02.000Z'));
+    await addImage(entry('note'), image('m', 'note', '2026-01-01T10:00:01.000Z'));
 
     expect(ids(await getImages('note'))).toEqual(['z', 'm', 'a']);
   });
 
   it("ne renvoie que les photos de la note demandée", async () => {
-    await addImage(image('1', 'note', '2026-01-01T10:00:00.000Z'));
-    await addImage(image('2', 'autre', '2026-01-01T10:00:00.000Z'));
+    await addImage(entry('note'), image('1', 'note', '2026-01-01T10:00:00.000Z'));
+    await addImage(entry('autre'), image('2', 'autre', '2026-01-01T10:00:00.000Z'));
 
     expect(ids(await getImages('note'))).toEqual(['1']);
   });
 
   it('conserve le contenu des fichiers', async () => {
-    await addImage(image('1', 'note', '2026-01-01T10:00:00.000Z'));
+    await addImage(entry('note'), image('1', 'note', '2026-01-01T10:00:00.000Z'));
 
     const [stored] = await getImages('note');
 
@@ -49,8 +73,8 @@ describe('photos des notes', () => {
   });
 
   it('deleteImage supprime une seule photo', async () => {
-    await addImage(image('1', 'note', '2026-01-01T10:00:00.000Z'));
-    await addImage(image('2', 'note', '2026-01-01T10:00:01.000Z'));
+    await addImage(entry('note'), image('1', 'note', '2026-01-01T10:00:00.000Z'));
+    await addImage(entry('note'), image('2', 'note', '2026-01-01T10:00:01.000Z'));
 
     await deleteImage('1');
 

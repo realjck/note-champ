@@ -1,3 +1,48 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Barre de défilement réduite à un trait gris, sans flèches ni gouttière.
+ * Elle est toujours réservée (overflow-x: scroll), 4 px sous le contenu, et
+ * compensée par une marge négative : son apparition ne décale pas la mise en page.
+ */
+@layer components {
+  .thin-scrollbar-x {
+    overflow-x: scroll;
+    padding-bottom: 4px;
+    margin-bottom: -8px;
+  }
+
+  .thin-scrollbar-x::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .thin-scrollbar-x::-webkit-scrollbar-track,
+  .thin-scrollbar-x::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  .thin-scrollbar-x::-webkit-scrollbar-thumb {
+    background: rgb(156 163 175 / 0.7);
+    border-radius: 9999px;
+  }
+
+  .thin-scrollbar-x::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  /*
+   * Firefox ne connaît pas les pseudo-éléments ci-dessus. Sa barre superposée
+   * n'occupe pas de place et se dessine dans la marge intérieure : celle-ci est
+   * agrandie pour que la barre passe sous les photos, et toujours compensée.
+   */
+  @supports not selector(::-webkit-scrollbar) {
+    .thin-scrollbar-x {
+      scrollbar-width: thin;
+      scrollbar-color: rgb(156 163 175 / 0.7) transparent;
+      padding-bottom: 12px;
+      margin-bottom: -12px;
+    }
+  }
+}

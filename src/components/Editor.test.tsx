@@ -1,13 +1,18 @@
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
 import { IDBFactory } from 'fake-indexeddb';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import Editor from './Editor';
 import { db, initialize } from '../lib/db';
 import { useStore } from '../store/useStore';
-import type { JournalEntry } from '../types';
+import { addImage, getImages } from '../lib/noteImages';
+import { processImage } from '../lib/images';
+import type { JournalEntry, NoteImage } from '../types';
+
+// jsdom ne sait ni décoder ni dessiner une image.
+vi.mock('../lib/images', () => ({ processImage: vi.fn() }));
 
 const existingEntry: JournalEntry = {
   id: 'existing',
@@ -156,5 +161,90 @@ describe("Éditeur : sauvegarde auto d'une note existante", () => {
     unmount();
 
     await waitFor(async () => expect(await storedEntries()).toEqual([]));
+  });
+});
+
+describe('Éditeur : photos', () => {
+  const processed = {
+    blob: new Blob(['photo'], { type: 'image/jpeg' }),
+    thumbnail: new Blob(['vignette'], { type: 'image/jpeg' }),
+    width: 1600,
+    height: 1200,
+  };
+
+  const storedPhoto: NoteImage = {
+    id: 'photo',
+    entryId: 'existing',
+    ...processed,
+    createdAt: '2026-01-01T10:00:00.000Z',
+  };
+
+  const jpeg = (name: string) => new File(['x'], name, { type: 'image/jpeg' });
+
+  const choosePhotos = (...files: File[]) =>
+    fireEvent.change(screen.getByLabelText('Ajouter des photos'), { target: { files } });
+
+  const thumbnails = () => screen.queryAllByRole('img', { name: /^Photo \d+$/ });
+
+  beforeEach(async () => {
+    URL.createObjectURL = vi.fn(() => 'blob:vignette');
+    URL.revokeObjectURL = vi.fn();
+    vi.mocked(processImage).mockReset().mockResolvedValue(processed);
+    await useStore.getState().loadEntries();
+  });
+
+  it('ajoute les photos choisies sous le texte et enregistre la nouvelle note', async () => {
+    renderEditor('/new');
+    choosePhotos(jpeg('a.jpg'), jpeg('b.jpg'));
+
+    await waitFor(() => expect(thumbnails()).toHaveLength(2));
+    const [saved] = await storedEntries();
+    expect(await getImages(saved.id)).toHaveLength(2);
+  });
+
+  it('indique que les photos sont en cours de traitement', async () => {
+    let finish: (value: typeof processed) => void = () => {};
+    vi.mocked(processImage).mockReturnValue(new Promise((resolve) => (finish = resolve)));
+    renderEditor('/new');
+    choosePhotos(jpeg('a.jpg'));
+
+    expect(await screen.findByRole('status')).toBeTruthy();
+    finish(processed);
+    await waitFor(() => expect(screen.queryByRole('status')).toBeNull());
+  });
+
+  it("affiche un message quand une photo ne peut pas être ajoutée", async () => {
+    vi.mocked(processImage).mockRejectedValue(new Error('« a.heic » : format non pris en charge.'));
+    renderEditor('/new');
+    choosePhotos(jpeg('a.heic'));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog.textContent).toContain('« a.heic » : format non pris en charge.');
+    expect(thumbnails()).toHaveLength(0);
+  });
+
+  describe('suppression', () => {
+    beforeEach(async () => {
+      await addImage(existingEntry, storedPhoto);
+      await useStore.getState().loadEntries();
+    });
+
+    it('supprime la photo après confirmation', async () => {
+      renderEditor('/edit/existing');
+      fireEvent.click(await screen.findByRole('button', { name: 'Supprimer la photo 1' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Supprimer' }));
+
+      await waitFor(() => expect(thumbnails()).toHaveLength(0));
+      expect(await getImages('existing')).toEqual([]);
+    });
+
+    it("garde la photo quand la suppression est annulée", async () => {
+      renderEditor('/edit/existing');
+      fireEvent.click(await screen.findByRole('button', { name: 'Supprimer la photo 1' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Annuler' }));
+
+      expect(thumbnails()).toHaveLength(1);
+      expect(await getImages('existing')).toHaveLength(1);
+    });
   });
 });

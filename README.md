@@ -7,27 +7,27 @@ Application de journal pour capturer vos pensées et prises de notes quotidienne
 
 ### Démo : [notechamp.pxly.fr](https://notechamp.pxly.fr)
 
-Utilisable sur mobile en Progressive Web App, les données sont stockées dans l'IndexedDB du navigateur avec possibilité d'import / export.
+Utilisable sur mobile en Progressive Web App, hors ligne et sans serveur : les
+données restent dans l'IndexedDB du navigateur.
+
+## Fonctionnalités
+
+- Notes avec titre, couleur et recherche.
+- Photos dans les notes : redimensionnées à 1600 px, métadonnées (dont la
+  position GPS) retirées, visionneuse plein écran avec zoom.
+- Sauvegarde complète en ZIP (`notes.json` et photos), réimportable. Les
+  anciens exports `.json` restent acceptés.
+- Thème clair ou sombre.
 
 ## Utilisation
 
-**Installation :**
-
 ```bash
-npm install
+npm install      # installation
+npm run dev      # serveur de développement
+npm test         # tests (Vitest)
+npm run lint     # ESLint
+npm run build    # build de production
 ```
 
-**Développement :**
-
-```bash
-npm run dev
-```
-
-**Compilation pour mise en production :**
-
-```bash
-npm run build
-```
-
-**Mise en production :** chaque push sur `main` lance les tests puis publie
-l'application sur GitHub Pages (`.github/workflows/deploy.yml`).
+**Mise en production :** chaque push sur `main` lance le lint, les tests et le
+build, puis publie l'application sur GitHub Pages (`.github/workflows/deploy.yml`).

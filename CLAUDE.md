@@ -27,3 +27,8 @@ Le projet est entièrement en français :
   `if (oldVersion < N)` dans `upgrade` (`src/lib/db.ts`) et l'incrément de `DB_VERSION`.
 - Les types de fichiers à servir hors ligne doivent figurer dans `globPatterns`
   (`vite.config.ts`).
+
+## Travaux prévus
+
+- Photos dans les notes : spécification validée dans `docs/photos.md`, à
+  réaliser étape par étape.

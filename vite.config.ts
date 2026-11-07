@@ -12,6 +12,7 @@ export default defineConfig({
         short_name: 'NoteChamp',
         description: 'Practical mobile journaling app for capturing daily thoughts and memories effortlessly',
         theme_color: '#000000',
+        background_color: '#f3f4f6',
         icons: [
           {
             src: '/pwa-192x192.png',
@@ -22,6 +23,12 @@ export default defineConfig({
             src: '/pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png'
+          },
+          {
+            src: '/maskable-icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
           }
         ]
       },

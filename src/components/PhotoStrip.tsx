@@ -8,14 +8,25 @@ interface PhotoStripProps {
   isProcessing: boolean;
   onAdd: (files: File[]) => void;
   onDelete: (image: NoteImage) => void;
+  /** Ouvre la visionneuse sur la photo à cette position (à partir de 0). */
+  onOpen: (index: number) => void;
 }
 
-function Thumbnail({ image, index, onDelete }: { image: NoteImage; index: number; onDelete: () => void }) {
+interface ThumbnailProps {
+  image: NoteImage;
+  index: number;
+  onOpen: () => void;
+  onDelete: () => void;
+}
+
+function Thumbnail({ image, index, onOpen, onDelete }: ThumbnailProps) {
   const url = useObjectUrl(image.thumbnail);
 
   return (
     <li className="relative shrink-0 snap-start">
-      <img src={url} alt={`Photo ${index}`} className="w-20 h-20 rounded-lg object-cover" />
+      <button onClick={onOpen} aria-label={`Agrandir la photo ${index}`} className="block rounded-lg">
+        <img src={url} alt={`Photo ${index}`} className="w-20 h-20 rounded-lg object-cover" />
+      </button>
       <button
         onClick={onDelete}
         aria-label={`Supprimer la photo ${index}`}
@@ -30,7 +41,7 @@ function Thumbnail({ image, index, onDelete }: { image: NoteImage; index: number
 }
 
 /** Bouton d'ajout et bande de vignettes défilant horizontalement. */
-export default function PhotoStrip({ images, isProcessing, onAdd, onDelete }: PhotoStripProps) {
+export default function PhotoStrip({ images, isProcessing, onAdd, onDelete, onOpen }: PhotoStripProps) {
   const stripRef = useHorizontalWheel<HTMLUListElement>();
 
   return (
@@ -66,7 +77,13 @@ export default function PhotoStrip({ images, isProcessing, onAdd, onDelete }: Ph
         // La marge intérieure laisse dépasser les croix ; la marge négative la compense.
         <ul ref={stripRef} className="thin-scrollbar-x -mt-1 pt-1 pr-1 flex gap-3 snap-x">
           {images.map((image, i) => (
-            <Thumbnail key={image.id} image={image} index={i + 1} onDelete={() => onDelete(image)} />
+            <Thumbnail
+              key={image.id}
+              image={image}
+              index={i + 1}
+              onOpen={() => onOpen(i)}
+              onDelete={() => onDelete(image)}
+            />
           ))}
         </ul>
       )}

@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { useDebouncedSave } from '../hooks/useDebouncedSave';
 import { useNoteImages } from '../hooks/useNoteImages';
+import { useCloseOnBack } from '../hooks/useCloseOnBack';
 import ConfirmModal from './ConfirmModal';
 import PhotoStrip from './PhotoStrip';
+import PhotoViewer from './PhotoViewer';
 import type { JournalEntry, NoteImage } from '../types';
 
 const COLORS = [
@@ -35,6 +37,9 @@ export default function Editor() {
   const photos = useNoteImages(entry);
   const [photoToDelete, setPhotoToDelete] = useState<NoteImage | null>(null);
   const [photoErrors, setPhotoErrors] = useState<string[]>([]);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+  const closeViewer = useCallback(() => setViewerIndex(null), []);
+  useCloseOnBack(viewerIndex !== null, closeViewer);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -129,7 +134,12 @@ export default function Editor() {
         isProcessing={photos.isProcessing}
         onAdd={handleAddPhotos}
         onDelete={setPhotoToDelete}
+        onOpen={setViewerIndex}
       />
+
+      {viewerIndex !== null && (
+        <PhotoViewer images={photos.images} index={viewerIndex} onClose={closeViewer} />
+      )}
 
       <button
         onClick={handleDone}

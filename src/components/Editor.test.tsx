@@ -184,6 +184,10 @@ describe('Éditeur : photos', () => {
   const choosePhotos = (...files: File[]) =>
     fireEvent.change(screen.getByLabelText('Ajouter des photos'), { target: { files } });
 
+  /** Photo affichée : les autres diapositives restent dans le DOM, rendues inertes. */
+  const currentSlide = () =>
+    screen.getAllByRole('group').find((slide) => !slide.hasAttribute('inert'));
+
   const thumbnails = () => screen.queryAllByRole('img', { name: /^Photo \d+$/ });
 
   beforeEach(async () => {
@@ -223,7 +227,7 @@ describe('Éditeur : photos', () => {
     expect(thumbnails()).toHaveLength(0);
   });
 
-  describe('suppression', () => {
+  describe('avec une photo enregistrée', () => {
     beforeEach(async () => {
       await addImage(existingEntry, storedPhoto);
       await useStore.getState().loadEntries();
@@ -236,6 +240,36 @@ describe('Éditeur : photos', () => {
 
       await waitFor(() => expect(thumbnails()).toHaveLength(0));
       expect(await getImages('existing')).toEqual([]);
+    });
+
+    it('ouvre la visionneuse sur la photo touchée', async () => {
+      await addImage(existingEntry, { ...storedPhoto, id: 'photo-2', createdAt: '2026-01-01T10:00:01.000Z' });
+      renderEditor('/edit/existing');
+
+      fireEvent.click(await screen.findByRole('button', { name: 'Agrandir la photo 2' }));
+
+      expect(await screen.findByRole('dialog', { name: 'Visionneuse de photos' })).toBeTruthy();
+      expect(currentSlide()?.getAttribute('aria-label')).toBe('Photo 2 sur 2');
+    });
+
+    it('ferme la visionneuse avec le bouton retour, sans quitter la note', async () => {
+      renderEditor('/edit/existing');
+      fireEvent.click(await screen.findByRole('button', { name: 'Agrandir la photo 1' }));
+      await screen.findByRole('dialog', { name: 'Visionneuse de photos' });
+
+      act(() => window.history.back());
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      expect(screen.getByPlaceholderText('Écrivez votre note...')).toBeTruthy();
+    });
+
+    it('ferme la visionneuse avec le bouton Fermer', async () => {
+      renderEditor('/edit/existing');
+      fireEvent.click(await screen.findByRole('button', { name: 'Agrandir la photo 1' }));
+
+      fireEvent.click(await screen.findByRole('button', { name: 'Fermer' }));
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     });
 
     it("garde la photo quand la suppression est annulée", async () => {

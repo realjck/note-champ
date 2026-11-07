@@ -4,7 +4,8 @@ import { X } from 'lucide-react';
 interface ConfirmModalProps {
   isOpen: boolean;
   title: string;
-  message: ReactNode;
+  /** Facultatif : une question en titre peut suffire. */
+  message?: ReactNode;
   confirmLabel: string;
   /** Sans libellé d'annulation, la modale devient un simple message avec un seul bouton. */
   cancelLabel?: string;
@@ -46,10 +47,10 @@ export default function ConfirmModal({
           <X className="w-5 h-5" />
         </button>
 
-        <h3 id="confirm-modal-title" className="text-xl font-semibold mb-4 pr-6 dark:text-white">
+        <h3 id="confirm-modal-title" className={`text-xl font-semibold pr-6 dark:text-white ${message ? 'mb-4' : 'mb-6'}`}>
           {title}
         </h3>
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-6 whitespace-pre-line">{message}</p>
+        {message && <p className="text-lg text-gray-600 dark:text-gray-300 mb-6 whitespace-pre-line">{message}</p>}
 
         <div className="flex space-x-4">
           {cancelLabel && (

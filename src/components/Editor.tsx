@@ -150,8 +150,7 @@ export default function Editor() {
 
       <ConfirmModal
         isOpen={photoToDelete !== null}
-        title="Supprimer la photo"
-        message={<>Supprimer cette photo&nbsp;?</>}
+        title="Supprimer la photo&#160;?"
         confirmLabel="Supprimer"
         cancelLabel="Annuler"
         tone="danger"

@@ -233,6 +233,14 @@ describe('Éditeur : photos', () => {
       await useStore.getState().loadEntries();
     });
 
+    it('demande la confirmation par une simple question, sans texte redondant', async () => {
+      renderEditor('/edit/existing');
+      fireEvent.click(await screen.findByRole('button', { name: 'Supprimer la photo 1' }));
+
+      const dialog = screen.getByRole('dialog', { name: /^Supprimer la photo\s\?$/ });
+      expect(dialog.querySelector('p')).toBeNull();
+    });
+
     it('supprime la photo après confirmation', async () => {
       renderEditor('/edit/existing');
       fireEvent.click(await screen.findByRole('button', { name: 'Supprimer la photo 1' }));

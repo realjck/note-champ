@@ -46,15 +46,15 @@ export default function PhotoStrip({ images, isProcessing, onAdd, onDelete, onOp
 
   return (
     <div className="mb-4 flex items-start gap-3">
-      <label className="shrink-0 w-20 h-20 flex flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-gray-300 text-gray-500 cursor-pointer focus-within:ring-2 focus-within:ring-blue-500 dark:border-gray-600 dark:text-gray-400">
+      <label className="shrink-0 w-20 h-20 flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 text-gray-500 cursor-pointer focus-within:ring-2 focus-within:ring-blue-500 dark:border-gray-600 dark:text-gray-400">
         {isProcessing ? (
-          <Loader2 className="w-6 h-6 animate-spin" aria-hidden="true" />
+          <Loader2 className="w-8 h-8 animate-spin" aria-hidden="true" />
         ) : (
-          <ImagePlus className="w-6 h-6" aria-hidden="true" />
+          <ImagePlus className="w-8 h-8" aria-hidden="true" />
         )}
-        <span className="text-xs text-center leading-tight">Ajouter des photos</span>
         <input
           type="file"
+          aria-label="Ajouter des photos"
           accept="image/*"
           multiple
           disabled={isProcessing}

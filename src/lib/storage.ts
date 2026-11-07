@@ -12,19 +12,17 @@ export async function requestPersistentStorage(
   return storage.persist();
 }
 
-/** Espace occupé et quota accordé à l'application, en octets. */
-export interface StorageUsage {
-  usage: number;
-  quota: number;
-}
-
-/** Estimation du navigateur, ou null s'il ne la fournit pas en entier. */
+/**
+ * Espace occupé par l'application en octets, ou null si le navigateur ne l'estime pas.
+ * Le quota n'est pas exposé : les navigateurs l'arrondissent ou le figent, et il
+ * ne reflète pas l'espace libre de l'appareil.
+ */
 export async function getStorageUsage(
   storage: Partial<Pick<StorageManager, 'estimate'>> | undefined
-): Promise<StorageUsage | null> {
+): Promise<number | null> {
   if (!storage?.estimate) return null;
-  const { usage, quota } = await storage.estimate();
-  return usage === undefined || !quota ? null : { usage, quota };
+  const { usage } = await storage.estimate();
+  return usage ?? null;
 }
 
 const UNITS = ['o', 'ko', 'Mo', 'Go'];
@@ -39,10 +37,4 @@ export function formatBytes(bytes: number): string {
     unit++;
   }
   return `${decimal.format(value)} ${UNITS[unit]}`;
-}
-
-/** Par exemple « 5,9 Mo sur 10,7 Go (0,1 %) ». */
-export function formatStorageUsage({ usage, quota }: StorageUsage): string {
-  const percent = decimal.format((usage / quota) * 100);
-  return `${formatBytes(usage)} sur ${formatBytes(quota)} (${percent} %)`;
 }

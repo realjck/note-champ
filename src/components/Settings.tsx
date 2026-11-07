@@ -3,12 +3,12 @@ import { Moon, Sun } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { db } from '../lib/db';
 import { exportBackup, readBackupFile, restoreBackup, type RestorableBackup } from '../lib/backup';
-import { formatStorageUsage, getStorageUsage, type StorageUsage } from '../lib/storage';
+import { formatBytes, getStorageUsage } from '../lib/storage';
 import ConfirmModal from './ConfirmModal';
 
-/** Espace occupé et quota de l'application, relus à la demande (null si le navigateur ne les estime pas). */
+/** Espace occupé par l'application, relu à la demande (null si le navigateur ne l'estime pas). */
 function useStorageUsage() {
-  const [usage, setUsage] = useState<StorageUsage | null>(null);
+  const [usage, setUsage] = useState<number | null>(null);
   const refresh = () => getStorageUsage(navigator.storage).then(setUsage);
 
   useEffect(() => {
@@ -135,7 +135,7 @@ export default function Settings() {
             )}
             {storage.usage !== null && (
               <p className="text-lg text-gray-500 dark:text-gray-400">
-                Espace utilisé : {formatStorageUsage(storage.usage)}
+                Espace utilisé : {formatBytes(storage.usage)}
               </p>
             )}
           </div>

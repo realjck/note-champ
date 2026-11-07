@@ -72,18 +72,18 @@ describe('Paramètres : espace utilisé', () => {
     fakeEstimate(12_345_678);
     render(<MemoryRouter><Settings /></MemoryRouter>);
 
-    expect(await screen.findByText('Espace utilisé : 12,3 Mo sur 10 Go (0,1 %)')).toBeTruthy();
+    expect(await screen.findByText('Espace utilisé : 12,3 Mo')).toBeTruthy();
   });
 
   it("met à jour l'espace utilisé après un import", async () => {
     fakeEstimate(1_000, 5_000_000);
     render(<MemoryRouter><Settings /></MemoryRouter>);
-    await screen.findByText('Espace utilisé : 1 ko sur 10 Go (0 %)');
+    await screen.findByText('Espace utilisé : 1 ko');
 
     chooseBackup(backupZip());
     fireEvent.click(await screen.findByRole('button', { name: 'Remplacer' }));
 
-    expect(await screen.findByText('Espace utilisé : 5 Mo sur 10 Go (0,1 %)')).toBeTruthy();
+    expect(await screen.findByText('Espace utilisé : 5 Mo')).toBeTruthy();
   });
 });
 

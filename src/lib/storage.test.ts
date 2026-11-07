@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatBytes, formatStorageUsage, getStorageUsage, requestPersistentStorage } from './storage';
+import { formatBytes, getStorageUsage, requestPersistentStorage } from './storage';
 
 function fakeStorage({ persisted, grant }: { persisted: boolean; grant: boolean }) {
   const calls = { persist: 0 };
@@ -40,24 +40,17 @@ describe('requestPersistentStorage', () => {
 });
 
 describe('getStorageUsage', () => {
-  it("renvoie l'espace occupé et le quota estimés par le navigateur", async () => {
+  // Le quota n'est pas utilisé : il ne reflète pas l'espace libre de l'appareil.
+  it("renvoie l'espace occupé estimé par le navigateur", async () => {
     const storage = { estimate: async () => ({ usage: 12_300_000, quota: 1e10 }) };
 
-    expect(await getStorageUsage(storage)).toEqual({ usage: 12_300_000, quota: 1e10 });
+    expect(await getStorageUsage(storage)).toBe(12_300_000);
   });
 
-  it("renvoie null quand le navigateur ne fournit pas d'estimation complète", async () => {
+  it("renvoie null quand le navigateur ne fournit pas d'estimation", async () => {
     expect(await getStorageUsage(undefined)).toBeNull();
     expect(await getStorageUsage({})).toBeNull();
     expect(await getStorageUsage({ estimate: async () => ({}) })).toBeNull();
-    expect(await getStorageUsage({ estimate: async () => ({ usage: 1_000 }) })).toBeNull();
-  });
-});
-
-describe('formatStorageUsage', () => {
-  it("affiche l'espace occupé, le quota et le pourcentage utilisé", () => {
-    expect(formatStorageUsage({ usage: 5_912_725, quota: 10_743_330_965 })).toBe('5,9 Mo sur 10,7 Go (0,1 %)');
-    expect(formatStorageUsage({ usage: 250_000_000, quota: 1_000_000_000 })).toBe('250 Mo sur 1 Go (25 %)');
   });
 });
 

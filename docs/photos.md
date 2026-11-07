@@ -1,7 +1,15 @@
 # Spécification : photos dans les notes
 
-Statut : validée, non implémentée. Ce document sert de référence pour la
-réalisation, étape par étape, dans une prochaine session.
+Statut : réalisée. Ce document reste la référence des choix faits.
+
+Écarts par rapport à la version initiale :
+
+- Visionneuse : yet-another-react-lightbox (plugin Zoom) plutôt que
+  PhotoSwipe, qui n'est plus publié depuis mai 2024.
+- `addImage` enregistre la photo et, si elle n'existe pas encore, sa note,
+  dans une seule transaction (au lieu d'un `flush` préalable).
+- La liste affiche « Sans titre » pour une note sans titre, plus fréquente
+  depuis qu'une note peut ne contenir que des photos.
 
 ## Objectif
 

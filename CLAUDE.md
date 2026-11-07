@@ -27,8 +27,13 @@ Le projet est entièrement en français :
   `if (oldVersion < N)` dans `upgrade` (`src/lib/db.ts`) et l'incrément de `DB_VERSION`.
 - Les types de fichiers à servir hors ligne doivent figurer dans `globPatterns`
   (`vite.config.ts`).
+- jsdom et Node n'ont ni canvas ni `createImageBitmap` : les tests qui passent
+  par le traitement d'image simulent `processImage` ou `createThumbnail`
+  (`vi.mock('../lib/images')`) et vérifient le reste dans le navigateur.
+- La sauvegarde est un ZIP (`notes.json` au format 2 et `images/<id>.jpg`,
+  voir `src/lib/backup.ts`). Les anciens exports `.json` restent acceptés à
+  l'import : toute évolution du format doit les garder lisibles.
 
-## Travaux prévus
+## Photos dans les notes
 
-- Photos dans les notes : spécification validée dans `docs/photos.md`, à
-  réaliser étape par étape.
+Réalisé selon `docs/photos.md`, qui reste la référence des choix faits.

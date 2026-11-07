@@ -47,6 +47,12 @@ function draw(
   return toJpeg(canvas);
 }
 
+function drawThumbnail(bitmap: ImageBitmap): Promise<Blob> {
+  const square = centerSquare(bitmap.width, bitmap.height);
+  const size = Math.min(THUMBNAIL_SIZE, square.size);
+  return draw(bitmap, { ...square, width: square.size, height: square.size }, size, size);
+}
+
 async function decode(file: File): Promise<ImageBitmap> {
   try {
     // Respecte l'orientation EXIF des photos de téléphone.
@@ -70,14 +76,19 @@ export async function processImage(file: File): Promise<ProcessedImage> {
   try {
     const full = { x: 0, y: 0, width: bitmap.width, height: bitmap.height };
     const { width, height } = fitWithin(bitmap.width, bitmap.height, MAX_SIZE);
-    const square = centerSquare(bitmap.width, bitmap.height);
-    const thumbSize = Math.min(THUMBNAIL_SIZE, square.size);
 
-    const [blob, thumbnail] = await Promise.all([
-      draw(bitmap, full, width, height),
-      draw(bitmap, { ...square, width: square.size, height: square.size }, thumbSize, thumbSize),
-    ]);
+    const [blob, thumbnail] = await Promise.all([draw(bitmap, full, width, height), drawThumbnail(bitmap)]);
     return { blob, thumbnail, width, height };
+  } finally {
+    bitmap.close();
+  }
+}
+
+/** Recrée la vignette d'une photo déjà enregistrée (import d'une sauvegarde). */
+export async function createThumbnail(blob: Blob): Promise<Blob> {
+  const bitmap = await createImageBitmap(blob);
+  try {
+    return await drawThumbnail(bitmap);
   } finally {
     bitmap.close();
   }

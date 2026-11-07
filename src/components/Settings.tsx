@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { db } from '../lib/db';
-import { parseBackup, restoreBackup, type Backup } from '../lib/backup';
+import { exportBackup, readBackupFile, restoreBackup, type RestorableBackup } from '../lib/backup';
 import ConfirmModal from './ConfirmModal';
 
 export default function Settings() {
   const { preferences, updatePreferences, entries, loadEntries, loadPreferences } = useStore();
-  const [pendingBackup, setPendingBackup] = useState<Backup | null>(null);
+  const [pendingBackup, setPendingBackup] = useState<RestorableBackup | null>(null);
+  const [busyMessage, setBusyMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ title: string; message: string } | null>(null);
 
   const toggleTheme = () => {
@@ -15,37 +16,37 @@ export default function Settings() {
   };
 
   const handleExportData = async () => {
-    const exportData = {
-      entries: entries,
-      preferences: preferences,
-      exportDate: new Date().toISOString()
-    };
-
-    const jsonString = JSON.stringify(exportData, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `notechamp-backup-${new Date().toISOString().split('T')[0]}.json`;
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    setBusyMessage('Préparation de la sauvegarde…');
+    try {
+      const url = URL.createObjectURL(await exportBackup(db));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `notechamp-backup-${new Date().toISOString().split('T')[0]}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Export error:', error);
+      setNotice({ title: 'Export impossible', message: "La sauvegarde n'a pas pu être créée." });
+    } finally {
+      setBusyMessage(null);
+    }
   };
 
   const handleImportData = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    event.target.value = '';
     if (!file) return;
 
+    setBusyMessage('Lecture de la sauvegarde…');
     try {
-      setPendingBackup(parseBackup(await file.text()));
+      setPendingBackup(await readBackupFile(file));
     } catch (error) {
       showImportError(error);
+    } finally {
+      setBusyMessage(null);
     }
-
-    event.target.value = '';
   };
 
   const handleImportConfirm = async () => {
@@ -97,7 +98,8 @@ export default function Settings() {
           <div className="space-y-4">
             <button
               onClick={handleExportData}
-              className="text-lg w-full p-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              disabled={busyMessage !== null}
+              className="text-lg w-full p-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
             >
               Exporter le journal
             </button>
@@ -106,11 +108,17 @@ export default function Settings() {
               Importer le journal
               <input
                 type="file"
-                accept=".json"
+                accept=".zip,.json,application/zip,application/json"
                 onChange={handleImportData}
+                disabled={busyMessage !== null}
                 className="hidden"
               />
             </label>
+            {busyMessage && (
+              <p role="status" className="text-lg text-center text-gray-500 dark:text-gray-400">
+                {busyMessage}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -118,7 +126,7 @@ export default function Settings() {
       <ConfirmModal
         isOpen={pendingBackup !== null}
         title="Importer le journal"
-        message={`Remplacer vos ${entries.length} note(s) actuelle(s) par les ${pendingBackup?.entries.length ?? 0} note(s) du fichier ?`}
+        message={`Remplacer vos ${entries.length} note(s) actuelle(s) par les ${pendingBackup?.entries.length ?? 0} note(s) et ${pendingBackup?.images.length ?? 0} photo(s) du fichier ?`}
         confirmLabel="Remplacer"
         cancelLabel="Annuler"
         tone="danger"

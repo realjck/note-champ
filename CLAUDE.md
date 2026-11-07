@@ -20,6 +20,8 @@ Le projet est entièrement en français :
   testés avec Testing Library et jsdom).
 - `npm run lint` : ESLint.
 - `npm run build` : build de production avec génération du service worker.
+- Déploiement : un push sur `main` publie sur GitHub Pages
+  (`.github/workflows/deploy.yml`, domaine `notechamp.pxly.fr`).
 
 ## Points d'attention
 

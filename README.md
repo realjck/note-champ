@@ -28,3 +28,6 @@ npm run dev
 ```bash
 npm run build
 ```
+
+**Mise en production :** chaque push sur `main` lance les tests puis publie
+l'application sur GitHub Pages (`.github/workflows/deploy.yml`).

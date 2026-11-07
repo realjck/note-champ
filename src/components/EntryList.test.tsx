@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom';
 import EntryList from './EntryList';
 import { useStore } from '../store/useStore';
@@ -75,6 +75,14 @@ describe('Liste des notes : carte', () => {
     const names = screen.getAllByRole('button').map((button) => button.getAttribute('aria-label'));
 
     expect(names).toEqual(['Ouvrir la note « Courses »', 'Supprimer la note « Courses »']);
+  });
+
+  it('demande de confirmer la suppression de la note', () => {
+    renderList();
+    fireEvent.click(screen.getByRole('button', { name: 'Supprimer la note « Courses »' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Supprimer la note' });
+    expect(within(dialog).getByRole('button', { name: 'Supprimer' })).toBeTruthy();
   });
 });
 

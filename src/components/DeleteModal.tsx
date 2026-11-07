@@ -11,9 +11,9 @@ export default function DeleteModal({ isOpen, onClose, onConfirm, title }: Delet
   return (
     <ConfirmModal
       isOpen={isOpen}
-      title="Effacer la note"
+      title="Supprimer la note"
       message={<>Êtes-vous sûr(e) de vouloir supprimer "{title}"&nbsp;?</>}
-      confirmLabel="Effacer"
+      confirmLabel="Supprimer"
       cancelLabel="Annuler"
       tone="danger"
       onConfirm={onConfirm}

@@ -98,7 +98,7 @@ export default function Editor() {
   };
 
   return (
-    <div className="p-4 h-[calc(100vh-5rem)] flex flex-col">
+    <div className="p-4 h-[calc(100dvh-5rem)] flex flex-col">
       <input
         type="text"
         value={entry.title}
@@ -126,7 +126,7 @@ export default function Editor() {
         onChange={(e) => update({ content: e.target.value })}
         placeholder="Écrivez votre note..."
         className="text-xl w-full flex-1 mb-4 p-4 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white resize-none"
-        style={{ height: 'calc(100vh - 16rem)' }}
+        style={{ height: 'calc(100dvh - 16rem)' }}
       />
 
       <PhotoStrip

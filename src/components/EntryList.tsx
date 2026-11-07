@@ -100,7 +100,7 @@ export default function EntryList() {
 
       <div className="mt-4 space-y-4">
         {isLoading ? (
-          <div className="flex justify-center items-center h-[calc(100vh-12rem)]">
+          <div className="flex justify-center items-center h-[calc(100dvh-12rem)]">
             <div
               role="status"
               aria-label="Chargement"
@@ -110,7 +110,7 @@ export default function EntryList() {
         ) : (
           <>
             {entries.length === 0 ? (
-              <div className="flex flex-col items-center justify-center text-center h-[calc(100vh-12rem)]">
+              <div className="flex flex-col items-center justify-center text-center h-[calc(100dvh-12rem)]">
                 <div className="flex items-center mb-4">
                   <img src={logo} alt="Logo" className="w-12 h-12 mr-2" />
                   <h1 className="text-3xl font-bold text-gray-800 dark:text-white">

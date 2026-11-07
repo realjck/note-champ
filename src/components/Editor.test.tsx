@@ -60,6 +60,17 @@ describe("Éditeur : sauvegarde auto d'une nouvelle note", () => {
     });
   });
 
+  it('attribue un UUID à la nouvelle note', async () => {
+    const { unmount } = renderEditor('/new');
+    typeContent('Idée');
+    unmount();
+
+    await waitFor(async () => {
+      const [saved] = await storedEntries();
+      expect(saved.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    });
+  });
+
   it('garde une seule note au fil des sauvegardes', async () => {
     renderEditor('/new');
     typeContent('Idée');

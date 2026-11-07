@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '../store/useStore';
 import { useDebouncedSave } from '../hooks/useDebouncedSave';
 import type { JournalEntry } from '../types';
@@ -17,7 +16,7 @@ type EditableFields = Partial<Pick<JournalEntry, 'title' | 'content' | 'color'>>
 
 const createEntry = (): JournalEntry => {
   const now = new Date().toISOString();
-  return { id: uuidv4(), title: '', content: '', color: COLORS[0], createdAt: now, updatedAt: now };
+  return { id: crypto.randomUUID(), title: '', content: '', color: COLORS[0], createdAt: now, updatedAt: now };
 };
 
 export default function Editor() {

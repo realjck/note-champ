@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Search, Trash2, Edit2, X, PlusCircle } from 'lucide-react';
+import { Search, Trash2, X, PlusCircle } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import DeleteModal from './DeleteModal';
 import logo from '../assets/images/logo.png';
@@ -71,6 +71,7 @@ export default function EntryList() {
           {search && (
             <button
               onClick={clearSearch}
+              aria-label="Effacer la recherche"
               className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
             >
               <X className="w-5 h-5" />
@@ -108,9 +109,15 @@ export default function EntryList() {
               sortedEntries.map(entry => (
                 <div
                   key={entry.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow p-3"
+                  className="relative bg-white dark:bg-gray-800 rounded-lg shadow p-3 hover:shadow-md transition-shadow"
                   style={{ borderLeft: `8px solid ${entry.color}` }}
                 >
+                  {/* Bouton invisible couvrant la carte : évite d'imbriquer le bouton Supprimer dans un autre bouton. */}
+                  <button
+                    onClick={() => handleNavigate(`/edit/${entry.id}`)}
+                    aria-label={`Ouvrir la note « ${entry.title} »`}
+                    className="absolute inset-0 w-full rounded-lg"
+                  />
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-semibold text-xl dark:text-white mb-2">{entry.title}</h3>
@@ -118,20 +125,13 @@ export default function EntryList() {
                         {format(new Date(entry.createdAt), 'PPP', { locale: fr })}
                       </p>
                     </div>
-                    <div className="flex space-x-3">
-                      <button
-                        onClick={() => handleNavigate(`/edit/${entry.id}`)}
-                        className="p-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
-                      >
-                        <Edit2 className="w-6 h-6" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(entry.id, entry.title)}
-                        className="p-1 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
-                      >
-                        <Trash2 className="w-6 h-6" />
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => handleDeleteClick(entry.id, entry.title)}
+                      aria-label={`Supprimer la note « ${entry.title} »`}
+                      className="relative p-1 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
+                    >
+                      <Trash2 className="w-6 h-6" />
+                    </button>
                   </div>
                   <p className="mt-2 text-lg pb-1 -mb-1 text-gray-600 dark:text-gray-300 line-clamp-3">
                     {entry.content}

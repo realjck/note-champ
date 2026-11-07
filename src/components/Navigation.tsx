@@ -13,6 +13,7 @@ export default function Navigation() {
         <div className="flex justify-around py-3">
           <button
             onClick={() => navigate('/')}
+            aria-label="Liste des notes"
             className={`p-2 rounded-lg ${
               location.pathname === '/' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'
             }`}
@@ -22,6 +23,7 @@ export default function Navigation() {
           <button
             onClick={() => navigate('/new')}
             disabled={isEditing}
+            aria-label="Nouvelle note"
             className={`p-2 rounded-lg ${
               isEditing 
                 ? 'text-gray-400 cursor-not-allowed opacity-50' 
@@ -34,6 +36,7 @@ export default function Navigation() {
           </button>
           <button
             onClick={() => navigate('/settings')}
+            aria-label="Paramètres"
             className={`p-2 rounded-lg ${
               location.pathname === '/settings' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'
             }`}

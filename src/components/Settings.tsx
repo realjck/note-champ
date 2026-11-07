@@ -81,6 +81,7 @@ export default function Settings() {
           </div>
           <button
             onClick={toggleTheme}
+            aria-label={preferences.theme === 'light' ? 'Activer le mode sombre' : 'Activer le mode clair'}
             className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow"
           >
             {preferences.theme === 'light' ? (

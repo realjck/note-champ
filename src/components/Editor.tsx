@@ -5,9 +5,13 @@ import { useDebouncedSave } from '../hooks/useDebouncedSave';
 import type { JournalEntry } from '../types';
 
 const COLORS = [
-  '#FF6B6B', '#4ECDC4', '#3498DB',
-  '#f5d222', '#D4A5A5', '#9B59B6',
-  '#2ECC71'
+  { value: '#FF6B6B', name: 'Rouge' },
+  { value: '#4ECDC4', name: 'Turquoise' },
+  { value: '#3498DB', name: 'Bleu' },
+  { value: '#f5d222', name: 'Jaune' },
+  { value: '#D4A5A5', name: 'Rose' },
+  { value: '#9B59B6', name: 'Violet' },
+  { value: '#2ECC71', name: 'Vert' },
 ];
 
 const AUTOSAVE_DELAY_MS = 500;
@@ -16,7 +20,7 @@ type EditableFields = Partial<Pick<JournalEntry, 'title' | 'content' | 'color'>>
 
 const createEntry = (): JournalEntry => {
   const now = new Date().toISOString();
-  return { id: crypto.randomUUID(), title: '', content: '', color: COLORS[0], createdAt: now, updatedAt: now };
+  return { id: crypto.randomUUID(), title: '', content: '', color: COLORS[0].value, createdAt: now, updatedAt: now };
 };
 
 export default function Editor() {
@@ -81,12 +85,14 @@ export default function Editor() {
       />
 
       <div className="mb-4 flex space-x-3">
-        {COLORS.map(color => (
+        {COLORS.map(({ value, name }) => (
           <button
-            key={color}
-            onClick={() => update({ color })}
-            className={`w-8 h-8 rounded-full ${entry.color === color ? 'ring-2 ring-offset-2 ring-blue-500' : ''}`}
-            style={{ backgroundColor: color }}
+            key={value}
+            onClick={() => update({ color: value })}
+            aria-label={name}
+            aria-pressed={entry.color === value}
+            className={`w-8 h-8 rounded-full ${entry.color === value ? 'ring-2 ring-offset-2 ring-blue-500' : ''}`}
+            style={{ backgroundColor: value }}
           />
         ))}
       </div>

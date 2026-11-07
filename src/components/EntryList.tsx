@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Search, Trash2, Edit2, X, PlusCircle } from 'lucide-react';
@@ -9,8 +9,7 @@ import logo from '../assets/images/logo.png';
 
 export default function EntryList() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { entries, isLoading, deleteEntry, preferences } = useStore();
+  const { entries, isLoading, deleteEntry } = useStore();
   const [search, setSearch] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<{ id: string; title: string } | null>(null);

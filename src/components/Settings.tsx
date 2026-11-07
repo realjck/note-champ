@@ -1,15 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { db } from '../lib/db';
 import { exportBackup, readBackupFile, restoreBackup, type RestorableBackup } from '../lib/backup';
+import { formatStorageUsage, getStorageUsage, type StorageUsage } from '../lib/storage';
 import ConfirmModal from './ConfirmModal';
+
+/** Espace occupé et quota de l'application, relus à la demande (null si le navigateur ne les estime pas). */
+function useStorageUsage() {
+  const [usage, setUsage] = useState<StorageUsage | null>(null);
+  const refresh = () => getStorageUsage(navigator.storage).then(setUsage);
+
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  return { usage, refresh };
+}
 
 export default function Settings() {
   const { preferences, updatePreferences, entries, loadEntries, loadPreferences } = useStore();
   const [pendingBackup, setPendingBackup] = useState<RestorableBackup | null>(null);
   const [busyMessage, setBusyMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ title: string; message: string } | null>(null);
+  const storage = useStorageUsage();
 
   const toggleTheme = () => {
     updatePreferences({ theme: preferences.theme === 'light' ? 'dark' : 'light' });
@@ -54,7 +68,7 @@ export default function Settings() {
     setPendingBackup(null);
     try {
       await restoreBackup(db, pendingBackup);
-      await Promise.all([loadEntries(), loadPreferences()]);
+      await Promise.all([loadEntries(), loadPreferences(), storage.refresh()]);
       setNotice({ title: 'Import terminé', message: 'Journal importé avec succès.' });
     } catch (error) {
       showImportError(error);
@@ -117,6 +131,11 @@ export default function Settings() {
             {busyMessage && (
               <p role="status" className="text-lg text-center text-gray-500 dark:text-gray-400">
                 {busyMessage}
+              </p>
+            )}
+            {storage.usage !== null && (
+              <p className="text-lg text-gray-500 dark:text-gray-400">
+                Espace utilisé : {formatStorageUsage(storage.usage)}
               </p>
             )}
           </div>

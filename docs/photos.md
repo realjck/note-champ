@@ -234,6 +234,5 @@ puis demande le commit.
 - Mettre à jour `CLAUDE.md` si de nouvelles commandes ou règles apparaissent.
 - Le service worker n'a rien à mettre en cache pour les photos : elles sont
   dans IndexedDB.
-- Surveiller l'espace utilisé. `navigator.storage.estimate()` pourrait plus
-  tard s'afficher dans les paramètres. Cette fonction est hors périmètre pour
-  l'instant.
+- Surveiller l'espace utilisé : les paramètres l'affichent depuis, d'après
+  `navigator.storage.estimate()` (`src/lib/storage.ts`).

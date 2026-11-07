@@ -59,6 +59,34 @@ beforeEach(async () => {
 
 afterEach(cleanup);
 
+const fakeEstimate = (...usages: number[]) => {
+  const estimate = vi.fn();
+  for (const usage of usages) estimate.mockResolvedValueOnce({ usage, quota: 1e10 });
+  Object.defineProperty(navigator, 'storage', { value: { estimate }, configurable: true });
+};
+
+describe('Paramètres : espace utilisé', () => {
+  afterEach(() => Reflect.deleteProperty(navigator, 'storage'));
+
+  it("affiche l'espace occupé par l'application", async () => {
+    fakeEstimate(12_345_678);
+    render(<MemoryRouter><Settings /></MemoryRouter>);
+
+    expect(await screen.findByText('Espace utilisé : 12,3 Mo sur 10 Go (0,1 %)')).toBeTruthy();
+  });
+
+  it("met à jour l'espace utilisé après un import", async () => {
+    fakeEstimate(1_000, 5_000_000);
+    render(<MemoryRouter><Settings /></MemoryRouter>);
+    await screen.findByText('Espace utilisé : 1 ko sur 10 Go (0 %)');
+
+    chooseBackup(backupZip());
+    fireEvent.click(await screen.findByRole('button', { name: 'Remplacer' }));
+
+    expect(await screen.findByText('Espace utilisé : 5 Mo sur 10 Go (0,1 %)')).toBeTruthy();
+  });
+});
+
 describe('Paramètres : import', () => {
   it('annonce les notes et les photos du fichier, puis les importe', async () => {
     render(<MemoryRouter><Settings /></MemoryRouter>);

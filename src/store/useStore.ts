@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { JournalEntry, UserPreferences } from '../types';
 import { db, defaultPreferences } from '../lib/db';
+import { countImages, deleteEntryWithImages } from '../lib/noteImages';
 
 interface State {
   entries: JournalEntry[];
@@ -25,9 +26,9 @@ export const useStore = create<State>((set, get) => ({
     set({ entries, isLoading: false });
   },
 
-  /** Crée ou met à jour la note ; une note vide est supprimée au lieu d'être enregistrée. */
+  /** Crée ou met à jour la note ; une note sans texte ni photo est supprimée au lieu d'être enregistrée. */
   saveEntry: async (entry) => {
-    if (isBlank(entry)) {
+    if (isBlank(entry) && (await countImages(entry.id)) === 0) {
       await db.delete('journal_entries', entry.id);
     } else {
       await db.put('journal_entries', entry);
@@ -36,7 +37,7 @@ export const useStore = create<State>((set, get) => ({
   },
 
   deleteEntry: async (id) => {
-    await db.delete('journal_entries', id);
+    await deleteEntryWithImages(id);
     get().loadEntries();
   },
 

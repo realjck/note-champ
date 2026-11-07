@@ -1,13 +1,25 @@
-import { openDB, type OpenDBCallbacks } from 'idb';
-import type { JournalEntry, UserPreferences } from '../types';
+import { openDB, type DBSchema, type OpenDBCallbacks } from 'idb';
+import type { JournalEntry, NoteImage, UserPreferences } from '../types';
 
 const DB_NAME = 'journal_db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
-type Schema = {
-  journal_entries: JournalEntry;
-  preferences: UserPreferences;
-};
+interface Schema extends DBSchema {
+  journal_entries: {
+    key: string;
+    value: JournalEntry;
+    indexes: { createdAt: string; color: string };
+  };
+  images: {
+    key: string;
+    value: NoteImage;
+    indexes: { entryId: string };
+  };
+  preferences: {
+    key: string;
+    value: UserPreferences;
+  };
+}
 
 /** Chaque étape migre depuis la version précédente : ajouter les suivantes en dessous, sous la forme `if (oldVersion < N)`. */
 export const upgrade: OpenDBCallbacks<Schema>['upgrade'] = (db, oldVersion) => {
@@ -19,6 +31,10 @@ export const upgrade: OpenDBCallbacks<Schema>['upgrade'] = (db, oldVersion) => {
     journalStore.createIndex('color', 'color');
 
     db.createObjectStore('preferences');
+  }
+  if (oldVersion < 2) {
+    const imageStore = db.createObjectStore('images', { keyPath: 'id' });
+    imageStore.createIndex('entryId', 'entryId');
   }
 };
 

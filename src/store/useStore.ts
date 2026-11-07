@@ -1,10 +1,12 @@
 import { create } from 'zustand';
 import type { JournalEntry, UserPreferences } from '../types';
 import { db, defaultPreferences } from '../lib/db';
-import { countImages, deleteEntryWithImages } from '../lib/noteImages';
+import { countImages, deleteEntryWithImages, getEntriesWithImageCounts } from '../lib/noteImages';
 
 interface State {
   entries: JournalEntry[];
+  /** Nombre de photos par identifiant de note ; une note sans photo n'y figure pas. */
+  imageCounts: Record<string, number>;
   preferences: UserPreferences;
   isLoading: boolean;
   loadEntries: () => Promise<void>;
@@ -18,12 +20,13 @@ const isBlank = (entry: JournalEntry) => !entry.title.trim() && !entry.content.t
 
 export const useStore = create<State>((set, get) => ({
   entries: [],
+  imageCounts: {},
   preferences: defaultPreferences,
   isLoading: true,
 
   loadEntries: async () => {
-    const entries = await db.getAll('journal_entries');
-    set({ entries, isLoading: false });
+    const { entries, imageCounts } = await getEntriesWithImageCounts();
+    set({ entries, imageCounts, isLoading: false });
   },
 
   /** Crée ou met à jour la note ; une note sans texte ni photo est supprimée au lieu d'être enregistrée. */

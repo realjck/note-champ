@@ -37,7 +37,7 @@ const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 beforeEach(() => {
   // La liste restaure le défilement mémorisé lors d'une navigation d'un test précédent.
   sessionStorage.clear();
-  useStore.setState({ entries: [], isLoading: true });
+  useStore.setState({ entries: [], imageCounts: {}, isLoading: true });
 });
 
 afterEach(cleanup);
@@ -75,5 +75,41 @@ describe('Liste des notes : carte', () => {
     const names = screen.getAllByRole('button').map((button) => button.getAttribute('aria-label'));
 
     expect(names).toEqual(['Ouvrir la note « Courses »', 'Supprimer la note « Courses »']);
+  });
+});
+
+describe('Liste des notes : photos', () => {
+  beforeEach(() => useStore.setState({ entries: [entry], isLoading: false }));
+
+  it('affiche le nombre de photos de la note', () => {
+    useStore.setState({ imageCounts: { courses: 3 } });
+    renderList();
+
+    expect(screen.getByRole('img', { name: '3 photos' }).textContent).toBe('3');
+  });
+
+  it('accorde le libellé au singulier', () => {
+    useStore.setState({ imageCounts: { courses: 1 } });
+    renderList();
+
+    expect(screen.getByRole('img', { name: '1 photo' })).toBeTruthy();
+  });
+
+  it("n'affiche pas d'icône quand la note n'a pas de photo", () => {
+    renderList();
+
+    expect(screen.queryByRole('img', { name: /photo/ })).toBeNull();
+  });
+});
+
+describe('Liste des notes : note sans titre', () => {
+  beforeEach(() => useStore.setState({ entries: [{ ...entry, title: '  ' }], isLoading: false }));
+
+  it('affiche « Sans titre » et nomme les boutons en conséquence', () => {
+    renderList();
+
+    expect(screen.getByRole('heading', { name: 'Sans titre' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Ouvrir la note « Sans titre »' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Supprimer la note « Sans titre »' })).toBeTruthy();
   });
 });

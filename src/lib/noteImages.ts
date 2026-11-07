@@ -41,3 +41,20 @@ export async function deleteEntryWithImages(entryId: string): Promise<void> {
 export async function countImages(entryId: string): Promise<number> {
   return db.countFromIndex('images', 'entryId', entryId);
 }
+
+/**
+ * Toutes les notes et le nombre de photos de chacune, en une seule
+ * transaction. Le comptage parcourt uniquement les clés de l'index, sans
+ * lire les photos.
+ */
+export async function getEntriesWithImageCounts() {
+  const tx = db.transaction(['journal_entries', 'images']);
+  const entries = await tx.objectStore('journal_entries').getAll();
+  const imageCounts: Record<string, number> = {};
+  let cursor = await tx.objectStore('images').index('entryId').openKeyCursor();
+  while (cursor) {
+    imageCounts[cursor.key] = (imageCounts[cursor.key] ?? 0) + 1;
+    cursor = await cursor.continue();
+  }
+  return { entries, imageCounts };
+}

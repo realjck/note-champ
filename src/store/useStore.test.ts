@@ -61,3 +61,16 @@ describe('saveEntry avec une note sans texte', () => {
     expect(await db.get('journal_entries', 'note')).toBeUndefined();
   });
 });
+
+describe('loadEntries', () => {
+  it('charge aussi le nombre de photos de chaque note', async () => {
+    await addImage(entry(), photo);
+    await addImage(entry(), { ...photo, id: 'photo-2' });
+    await addImage(entry({ id: 'autre' }), { ...photo, id: 'photo-3', entryId: 'autre' });
+    await db.put('journal_entries', entry({ id: 'sans-photo' }));
+
+    await useStore.getState().loadEntries();
+
+    expect(useStore.getState().imageCounts).toEqual({ note: 2, autre: 1 });
+  });
+});

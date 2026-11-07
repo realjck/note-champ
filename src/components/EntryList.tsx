@@ -2,14 +2,32 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Search, Trash2, X, PlusCircle } from 'lucide-react';
+import { Search, Trash2, X, PlusCircle, Image as ImageIcon } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import DeleteModal from './DeleteModal';
 import logo from '../assets/images/logo.png';
+import type { JournalEntry } from '../types';
+
+const UNTITLED = 'Sans titre';
+
+const displayTitle = (entry: JournalEntry) => entry.title.trim() || UNTITLED;
+
+function PhotoCount({ count }: { count: number }) {
+  return (
+    <span
+      role="img"
+      aria-label={`${count} ${count > 1 ? 'photos' : 'photo'}`}
+      className="flex items-center gap-1 rounded px-1.5 py-0.5 bg-gray-900 text-white dark:bg-white dark:text-gray-900"
+    >
+      <ImageIcon className="w-4 h-4" aria-hidden="true" />
+      <span aria-hidden="true">{count}</span>
+    </span>
+  );
+}
 
 export default function EntryList() {
   const navigate = useNavigate();
-  const { entries, isLoading, deleteEntry } = useStore();
+  const { entries, imageCounts, isLoading, deleteEntry } = useStore();
   const [search, setSearch] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<{ id: string; title: string } | null>(null);
@@ -115,19 +133,26 @@ export default function EntryList() {
                   {/* Bouton invisible couvrant la carte : évite d'imbriquer le bouton Supprimer dans un autre bouton. */}
                   <button
                     onClick={() => handleNavigate(`/edit/${entry.id}`)}
-                    aria-label={`Ouvrir la note « ${entry.title} »`}
+                    aria-label={`Ouvrir la note « ${displayTitle(entry)} »`}
                     className="absolute inset-0 w-full rounded-lg"
                   />
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-semibold text-xl dark:text-white mb-2">{entry.title}</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {format(new Date(entry.createdAt), 'PPP', { locale: fr })}
-                      </p>
+                      <h3
+                        className={`font-semibold text-xl mb-2 ${
+                          entry.title.trim() ? 'dark:text-white' : 'italic text-gray-400 dark:text-gray-500'
+                        }`}
+                      >
+                        {displayTitle(entry)}
+                      </h3>
+                      <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                        <p>{format(new Date(entry.createdAt), 'PPP', { locale: fr })}</p>
+                        {imageCounts[entry.id] && <PhotoCount count={imageCounts[entry.id]} />}
+                      </div>
                     </div>
                     <button
-                      onClick={() => handleDeleteClick(entry.id, entry.title)}
-                      aria-label={`Supprimer la note « ${entry.title} »`}
+                      onClick={() => handleDeleteClick(entry.id, displayTitle(entry))}
+                      aria-label={`Supprimer la note « ${displayTitle(entry)} »`}
                       className="relative p-1 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
                     >
                       <Trash2 className="w-6 h-6" />

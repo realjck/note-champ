@@ -9,10 +9,9 @@ Le projet est entièrement en français :
 
 - Interface utilisateur : textes, messages et libellés `aria-label`.
 - Commentaires de code et JSDoc.
+- Noms de tests (`describe` / `it`), sauf quand ils reprennent le nom d'une fonction.
 - README et documentation.
 - Messages de commit.
-
-Exception : les noms de tests (`describe` / `it`) sont pour l'instant en anglais.
 
 ## Commandes
 

@@ -14,27 +14,27 @@ function fakeStorage({ persisted, grant }: { persisted: boolean; grant: boolean 
 }
 
 describe('requestPersistentStorage', () => {
-  it('asks for persistence when storage is not yet persistent', async () => {
+  it("demande la persistance quand le stockage n'est pas encore persistant", async () => {
     const { storage, calls } = fakeStorage({ persisted: false, grant: true });
 
     expect(await requestPersistentStorage(storage)).toBe(true);
     expect(calls.persist).toBe(1);
   });
 
-  it('reports a refusal from the browser', async () => {
+  it('signale un refus du navigateur', async () => {
     const { storage } = fakeStorage({ persisted: false, grant: false });
 
     expect(await requestPersistentStorage(storage)).toBe(false);
   });
 
-  it('does not ask again when storage is already persistent', async () => {
+  it('ne redemande pas quand le stockage est déjà persistant', async () => {
     const { storage, calls } = fakeStorage({ persisted: true, grant: true });
 
     expect(await requestPersistentStorage(storage)).toBe(true);
     expect(calls.persist).toBe(0);
   });
 
-  it('returns false when the browser has no storage API', async () => {
+  it("renvoie false quand le navigateur n'a pas d'API de stockage", async () => {
     expect(await requestPersistentStorage(undefined)).toBe(false);
   });
 });

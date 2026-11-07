@@ -18,8 +18,8 @@ beforeEach(() => {
   globalThis.indexedDB = new IDBFactory();
 });
 
-describe('database upgrade', () => {
-  it('keeps existing notes when the database version is bumped', async () => {
+describe('mise à jour de la base', () => {
+  it('conserve les notes existantes quand la version de la base augmente', async () => {
     const v1 = await openDB('journal_db', 1, { upgrade });
     await v1.add('journal_entries', entry);
     v1.close();

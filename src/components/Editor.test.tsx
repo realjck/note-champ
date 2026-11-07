@@ -48,10 +48,10 @@ beforeEach(async () => {
 
 afterEach(cleanup);
 
-describe('Editor autosave on a new note', () => {
+describe("Éditeur : sauvegarde auto d'une nouvelle note", () => {
   beforeEach(() => useStore.getState().loadEntries());
 
-  it('saves the note after a pause in typing', async () => {
+  it('enregistre la note après une pause dans la frappe', async () => {
     renderEditor('/new');
     typeContent('Idée');
 
@@ -60,7 +60,7 @@ describe('Editor autosave on a new note', () => {
     });
   });
 
-  it('keeps a single entry across successive saves', async () => {
+  it('garde une seule note au fil des sauvegardes', async () => {
     renderEditor('/new');
     typeContent('Idée');
     await waitFor(async () => expect(await storedEntries()).toHaveLength(1));
@@ -71,7 +71,7 @@ describe('Editor autosave on a new note', () => {
     });
   });
 
-  it('saves pending changes when leaving the editor', async () => {
+  it("enregistre les modifications en attente en quittant l'éditeur", async () => {
     const { unmount } = renderEditor('/new');
     typeContent('Vite');
     unmount();
@@ -81,7 +81,7 @@ describe('Editor autosave on a new note', () => {
     });
   });
 
-  it('saves pending changes when the app goes to the background', async () => {
+  it("enregistre les modifications en attente quand l'appli passe en arrière-plan", async () => {
     renderEditor('/new');
     typeContent('Avant de verrouiller');
 
@@ -92,7 +92,7 @@ describe('Editor autosave on a new note', () => {
     await waitFor(async () => expect(await storedEntries()).toHaveLength(1));
   });
 
-  it('does not store a note left blank', async () => {
+  it("n'enregistre pas une note laissée vide", async () => {
     const { unmount } = renderEditor('/new');
     typeContent('   ');
     unmount();
@@ -102,13 +102,13 @@ describe('Editor autosave on a new note', () => {
   });
 });
 
-describe('Editor autosave on an existing note', () => {
+describe("Éditeur : sauvegarde auto d'une note existante", () => {
   beforeEach(async () => {
     await db.add('journal_entries', existingEntry);
     await useStore.getState().loadEntries();
   });
 
-  it('saves the changes and returns to the list on "Terminé"', async () => {
+  it('enregistre les modifications et revient à la liste avec « Terminé »', async () => {
     renderEditor('/edit/existing');
     typeContent('Pain, lait');
     fireEvent.click(screen.getByRole('button', { name: 'Terminé' }));
@@ -119,7 +119,7 @@ describe('Editor autosave on an existing note', () => {
     expect(saved.updatedAt > existingEntry.updatedAt).toBe(true);
   });
 
-  it('keeps the text being typed when the entries reload', async () => {
+  it('garde le texte en cours de saisie quand les notes se rechargent', async () => {
     renderEditor('/edit/existing');
     typeContent('Pain, lait, œufs');
 
@@ -131,14 +131,14 @@ describe('Editor autosave on an existing note', () => {
     );
   });
 
-  it('returns to the list when the note does not exist', async () => {
+  it("revient à la liste quand la note n'existe pas", async () => {
     renderEditor('/edit/missing');
 
     await screen.findByText('Liste des notes');
     expect((await storedEntries()).map((e) => e.id)).toEqual(['existing']);
   });
 
-  it('deletes the note when it is emptied', async () => {
+  it('supprime la note quand elle est vidée', async () => {
     const { unmount } = renderEditor('/edit/existing');
     fireEvent.change(screen.getByPlaceholderText('Titre'), { target: { value: '' } });
     typeContent('');

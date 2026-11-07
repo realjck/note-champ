@@ -17,7 +17,7 @@ const makeEntry = (id: string, title = `Note ${id}`): JournalEntry => ({
 const backupText = (data: unknown) => JSON.stringify(data);
 
 describe('parseBackup', () => {
-  it('accepts a file produced by the export', () => {
+  it("accepte un fichier produit par l'export", () => {
     const data = {
       entries: [makeEntry('a'), makeEntry('b')],
       preferences: { theme: 'dark' },
@@ -30,40 +30,40 @@ describe('parseBackup', () => {
     });
   });
 
-  it('rejects text that is not JSON', () => {
+  it("refuse un texte qui n'est pas du JSON", () => {
     expect(() => parseBackup('pas du json')).toThrow();
   });
 
-  it('rejects a file without an entries array', () => {
+  it('refuse un fichier sans liste de notes', () => {
     expect(() => parseBackup(backupText({ notes: [] }))).toThrow();
   });
 
-  it('rejects an entry with a missing field', () => {
+  it('refuse une note avec un champ manquant', () => {
     const withoutTitle: Partial<JournalEntry> = makeEntry('a');
     delete withoutTitle.title;
     expect(() => parseBackup(backupText({ entries: [withoutTitle] }))).toThrow();
   });
 
-  it('rejects an entry with an empty id', () => {
+  it('refuse une note avec un id vide', () => {
     expect(() => parseBackup(backupText({ entries: [makeEntry('')] }))).toThrow();
   });
 
-  it('rejects an entry with an invalid date', () => {
+  it('refuse une note avec une date invalide', () => {
     const entry = { ...makeEntry('a'), createdAt: 'hier' };
     expect(() => parseBackup(backupText({ entries: [entry] }))).toThrow();
   });
 
-  it('rejects duplicate entry ids', () => {
+  it('refuse des notes ayant le même id', () => {
     const entries = [makeEntry('a'), makeEntry('a', 'Autre')];
     expect(() => parseBackup(backupText({ entries }))).toThrow();
   });
 
-  it('rejects an unknown theme', () => {
+  it('refuse un thème inconnu', () => {
     const data = { entries: [], preferences: { theme: 'rose' } };
     expect(() => parseBackup(backupText(data))).toThrow();
   });
 
-  it('accepts a file without preferences', () => {
+  it('accepte un fichier sans préférences', () => {
     expect(parseBackup(backupText({ entries: [] }))).toEqual({ entries: [] });
   });
 });
@@ -73,7 +73,7 @@ describe('restoreBackup', () => {
     globalThis.indexedDB = new IDBFactory();
   });
 
-  it('replaces all entries and preferences', async () => {
+  it('remplace toutes les notes et les préférences', async () => {
     const db = await initDB();
     await db.add('journal_entries', makeEntry('old'));
 
@@ -86,7 +86,7 @@ describe('restoreBackup', () => {
     expect(await db.get('preferences', 'user')).toEqual({ theme: 'dark' });
   });
 
-  it('keeps existing data when the restore fails midway', async () => {
+  it("conserve les données existantes si l'import échoue en cours de route", async () => {
     const db = await initDB();
     await db.add('journal_entries', makeEntry('old'));
 

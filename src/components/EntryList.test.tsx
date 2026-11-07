@@ -20,8 +20,8 @@ beforeEach(() => useStore.setState({ entries: [], isLoading: true }));
 
 afterEach(cleanup);
 
-describe('EntryList loading state', () => {
-  it('shows the spinner, not the empty state, while notes are loading', async () => {
+describe('Liste des notes : chargement', () => {
+  it("affiche le spinner et non l'écran d'accueil pendant le chargement", async () => {
     renderList();
     await act(() => pause(50));
 
@@ -29,7 +29,7 @@ describe('EntryList loading state', () => {
     expect(screen.queryByText(EMPTY_STATE_TEXT)).toBeNull();
   });
 
-  it('shows the empty state once loading is done with no notes', async () => {
+  it("affiche l'écran d'accueil une fois le chargement terminé sans note", async () => {
     renderList();
     act(() => useStore.setState({ isLoading: false }));
 

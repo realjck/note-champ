@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Barre de défilement de la page aux couleurs du thème (gris 100/400, ou 900/600 en sombre). */
+@layer base {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #9ca3af #f3f4f6;
+  }
+
+  html:has(.dark) {
+    scrollbar-color: #4b5563 #111827;
+  }
+}
+
 /*
  * Barre de défilement réduite à un trait gris, sans flèches ni gouttière.
  * Elle est toujours réservée (overflow-x: scroll), 4 px sous le contenu, et
@@ -9,6 +21,8 @@
  */
 @layer components {
   .thin-scrollbar-x {
+    /* Annule la couleur héritée de html : sinon Chrome ignore les ::-webkit-scrollbar. */
+    scrollbar-color: auto;
     overflow-x: scroll;
     padding-bottom: 4px;
     margin-bottom: -8px;

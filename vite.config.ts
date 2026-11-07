@@ -10,7 +10,8 @@ export default defineConfig({
       manifest: {
         name: 'NoteChamp',
         short_name: 'NoteChamp',
-        description: 'Practical mobile journaling app for capturing daily thoughts and memories effortlessly',
+        description: 'Application de journal pour capturer vos pensées et prises de notes quotidiennes',
+        lang: 'fr',
         theme_color: '#000000',
         background_color: '#f3f4f6',
         icons: [
